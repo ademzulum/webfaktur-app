@@ -18,11 +18,12 @@ export default async function Startseite() {
           Webfaktur
         </p>
         <h1 className="text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
-          Rechnungen schreiben, ohne Umwege.
+          Aus Anrufen werden messbare Aufträge.
         </h1>
         <p className="text-pretty text-lg text-muted-foreground">
-          Das Grundgerüst steht: Next.js, Tailwind, shadcn/ui und Supabase sind
-          eingerichtet. Die Funktionen entstehen Schritt für Schritt.
+          Anrufe über Google Ads werden erfasst, vom Betrieb in zwei Taps
+          bewertet und als Umsatz an Google zurückgemeldet. So optimiert Google
+          auf Aufträge statt auf Klicks.
         </p>
       </header>
 

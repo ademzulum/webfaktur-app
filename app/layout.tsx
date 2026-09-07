@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Webfaktur",
-  description: "Rechnungen schreiben, ohne Umwege.",
+  description: "Anrufe aus Google Ads bewerten und als Umsatz zurückmelden.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
