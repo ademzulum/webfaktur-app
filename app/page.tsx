@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { CheckCircle2, XCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -51,10 +52,7 @@ export default async function Startseite() {
       </section>
 
       <div className="flex flex-wrap items-center gap-3">
-        <Button disabled>Anmelden</Button>
-        <span className="text-sm text-muted-foreground">
-          folgt im nächsten Schritt
-        </span>
+        <Button render={<Link href="/login" />}>Anmelden</Button>
       </div>
     </main>
   );
