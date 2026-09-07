@@ -100,6 +100,12 @@ create table public.pruefergebnis (
 );
 grant all on public.pruefergebnis to authenticated;
 
+-- Supabase schaltet bei JEDER neu angelegten Tabelle im public-Schema
+-- automatisch die Zeilenregeln ein. Fuer echte Tabellen ist das ein
+-- gutes Sicherheitsnetz - diese hier ist aber nur ein Messwerkzeug und
+-- muss von den Testrollen beschrieben werden koennen.
+alter table public.pruefergebnis disable row level security;
+
 
 -- ---------------------------------------------------------------------------
 -- Szenario 1: angemeldet als Nutzer von Betrieb A
