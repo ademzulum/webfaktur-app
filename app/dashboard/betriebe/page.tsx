@@ -1,3 +1,4 @@
+import { Plus } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -13,6 +14,8 @@ import {
 import { centAlsEuro } from "@/lib/geld";
 import { holeAngemeldetenNutzer } from "@/lib/nutzer";
 import { createClient } from "@/lib/supabase/server";
+
+export const dynamic = "force-dynamic";
 
 type Zeile = {
   id: string;
@@ -41,17 +44,16 @@ export default async function BetriebeUebersicht() {
   const betriebe = (data ?? []) as Zeile[];
 
   return (
-    <main className="mx-auto w-full max-w-4xl flex-1 px-6 py-16">
+    <main className="auftauchen mx-auto w-full max-w-5xl flex-1 px-4 py-10 sm:px-6 sm:py-14">
       <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
-        <div className="space-y-1">
-          <h1 className="text-2xl font-semibold tracking-tight">Betriebe</h1>
-          <p className="text-sm text-muted-foreground">
-            {betriebe.length === 1
-              ? "1 Betrieb"
-              : `${betriebe.length} Betriebe`}
+        <div className="space-y-2">
+          <h1 className="text-3xl font-semibold tracking-tight">Betriebe</h1>
+          <p className="font-mono text-xs text-muted-foreground">
+            {betriebe.length === 1 ? "1 Betrieb" : `${betriebe.length} Betriebe`}
           </p>
         </div>
         <Button render={<Link href="/dashboard/betriebe/neu" />}>
+          <Plus className="size-4" />
           Neuer Betrieb
         </Button>
       </header>
@@ -61,9 +63,9 @@ export default async function BetriebeUebersicht() {
           Konnte nicht geladen werden: {error.message}
         </p>
       ) : betriebe.length === 0 ? (
-        <div className="rounded-lg border bg-card p-8 text-center">
+        <div className="rounded-lg border border-dashed bg-card/50 p-10 text-center">
           <p className="font-medium">Noch kein Betrieb angelegt.</p>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
             Jeder Anruf gehört später genau einem Betrieb. Ohne mindestens
             einen Betrieb kann kein Anruf gespeichert werden.
           </p>
@@ -74,22 +76,40 @@ export default async function BetriebeUebersicht() {
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
-                <TableHead>Paket</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Klein</TableHead>
-                <TableHead className="text-right">Mittel</TableHead>
-                <TableHead className="text-right">Groß</TableHead>
+                <TableHead className="hidden sm:table-cell">Paket</TableHead>
+                <TableHead className="hidden sm:table-cell">Status</TableHead>
+                <TableHead className="hidden text-right lg:table-cell">
+                  Klein
+                </TableHead>
+                <TableHead className="hidden text-right lg:table-cell">
+                  Mittel
+                </TableHead>
+                <TableHead className="hidden text-right lg:table-cell">
+                  Groß
+                </TableHead>
                 <TableHead />
               </TableRow>
             </TableHeader>
             <TableBody>
               {betriebe.map((betrieb) => (
-                <TableRow key={betrieb.id}>
-                  <TableCell className="font-medium">{betrieb.name}</TableCell>
-                  <TableCell className="text-muted-foreground">
+                <TableRow
+                  key={betrieb.id}
+                  className="transition-colors hover:bg-muted/40"
+                >
+                  <TableCell className="font-medium">
+                    {betrieb.name}
+                    {/* Am Handy fehlen die eigenen Spalten - Paket und
+                        Status rutschen deshalb unter den Namen. */}
+                    <span className="mt-1 block font-mono text-xs font-normal text-muted-foreground sm:hidden">
+                      {betrieb.paket}
+                      {" · "}
+                      {betrieb.aktiv ? "aktiv" : "stillgelegt"}
+                    </span>
+                  </TableCell>
+                  <TableCell className="hidden font-mono text-xs text-muted-foreground sm:table-cell">
                     {betrieb.paket}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="hidden sm:table-cell">
                     {betrieb.aktiv ? (
                       <span className="text-emerald-600 dark:text-emerald-500">
                         aktiv
@@ -98,13 +118,13 @@ export default async function BetriebeUebersicht() {
                       <span className="text-muted-foreground">stillgelegt</span>
                     )}
                   </TableCell>
-                  <TableCell className="text-right tabular-nums">
+                  <TableCell className="hidden text-right font-mono text-xs tabular-nums lg:table-cell">
                     {centAlsEuro(betrieb.wert_klein_cent)}
                   </TableCell>
-                  <TableCell className="text-right tabular-nums">
+                  <TableCell className="hidden text-right font-mono text-xs tabular-nums lg:table-cell">
                     {centAlsEuro(betrieb.wert_mittel_cent)}
                   </TableCell>
-                  <TableCell className="text-right tabular-nums">
+                  <TableCell className="hidden text-right font-mono text-xs tabular-nums lg:table-cell">
                     {centAlsEuro(betrieb.wert_gross_cent)}
                   </TableCell>
                   <TableCell className="text-right whitespace-nowrap">

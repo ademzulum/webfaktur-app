@@ -58,7 +58,8 @@ export default async function Bewertungsseite({
 
   const eintrag = (Array.isArray(data) ? data[0] : null) as Daten | null;
 
-  const rahmen = "mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-5 py-12";
+  const rahmen =
+    "auftauchen mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-5 py-10 sm:py-16";
 
   if (!eintrag) {
     return (
@@ -117,12 +118,12 @@ export default async function Bewertungsseite({
         <p className="text-sm font-medium text-muted-foreground">
           {eintrag.betrieb_name}
         </p>
-        <h1 className="text-2xl font-semibold tracking-tight text-balance">
+        <h1 className="text-2xl font-semibold tracking-tight text-balance sm:text-3xl">
           Ist aus diesem Anruf ein Auftrag geworden?
         </h1>
         <div className="rounded-lg border bg-card px-4 py-3 text-sm">
-          <p className="font-medium">{eintrag.anrufer_nummer ?? "Nummer unbekannt"}</p>
-          <p className="mt-0.5 text-muted-foreground">
+          <p className="font-mono font-medium">{eintrag.anrufer_nummer ?? "Nummer unbekannt"}</p>
+          <p className="mt-0.5 font-mono text-xs text-muted-foreground">
             {zeitpunkt} Uhr · {dauerLesbar(eintrag.dauer_sekunden)}
           </p>
         </div>
@@ -136,11 +137,11 @@ export default async function Bewertungsseite({
             <Button
               type="submit"
               variant={stufe.wert === "kein_auftrag" ? "outline" : "default"}
-              className="h-14 w-full justify-between px-5 text-base"
+              className="h-16 w-full justify-between px-5 text-base transition-transform duration-150 active:scale-[0.98]"
             >
               <span>{stufe.beschriftung}</span>
               {stufe.betrag !== null ? (
-                <span className="text-sm opacity-80 tabular-nums">
+                <span className="font-mono text-sm tabular-nums opacity-80">
                   ca. {centAlsEuro(stufe.betrag)}
                 </span>
               ) : null}

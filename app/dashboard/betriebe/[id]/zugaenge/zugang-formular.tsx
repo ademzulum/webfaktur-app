@@ -80,11 +80,6 @@ export function ZugangFormular({
         </div>
       </div>
 
-      <p className="text-sm text-muted-foreground">
-        Das Passwort wird automatisch erzeugt und nach dem Anlegen einmalig
-        angezeigt.
-      </p>
-
       {zustand.fehler ? (
         <p role="alert" className="text-sm font-medium text-destructive">
           {zustand.fehler}

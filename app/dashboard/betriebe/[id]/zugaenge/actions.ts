@@ -112,3 +112,67 @@ export async function betriebsnutzerAnlegen(
   revalidatePath(`/dashboard/betriebe/${betriebId}/zugaenge`);
   return { zugangsdaten: { email, passwort } };
 }
+
+export type LoeschZustand = { fehler?: string };
+
+/**
+ * Entfernt einen Zugang.
+ *
+ * Gelöscht wird das Anmeldekonto. Die Zeile in nutzer verschwindet dabei von
+ * selbst mit, weil sie per "on delete cascade" daran hängt - deshalb braucht
+ * die Serverrolle dafür kein Löschrecht auf der Tabelle.
+ *
+ * Zwei Schutzvorkehrungen:
+ *   1. Der eigene Zugang lässt sich nicht entfernen. Sonst könnte man sich
+ *      versehentlich selbst aussperren, und niemand käme mehr an die
+ *      Verwaltung heran.
+ *   2. Nur Zugänge mit der Rolle "betrieb" und nur solche, die wirklich zu
+ *      diesem Betrieb gehören. Sonst liesse sich über eine veränderte
+ *      Adresszeile ein fremder Zugang löschen.
+ */
+export async function betriebsnutzerEntfernen(
+  betriebId: string,
+  nutzerId: string,
+  _vorher: LoeschZustand,
+): Promise<LoeschZustand> {
+  const angemeldet = await holeAngemeldetenNutzer();
+  if (!angemeldet || angemeldet.rolle !== "admin") {
+    return { fehler: "Dafür fehlt dir die Berechtigung." };
+  }
+
+  if (nutzerId === angemeldet.id) {
+    return { fehler: "Der eigene Zugang lässt sich hier nicht entfernen." };
+  }
+
+  const supabase = await createClient();
+  const { data: zeile, error: lesefehler } = await supabase
+    .from("nutzer")
+    .select("id, betrieb_id, rolle")
+    .eq("id", nutzerId)
+    .maybeSingle();
+
+  if (lesefehler) {
+    return { fehler: `Zugang konnte nicht geprüft werden: ${lesefehler.message}` };
+  }
+  if (!zeile) return { fehler: "Zugang nicht gefunden." };
+  if (zeile.betrieb_id !== betriebId || zeile.rolle !== "betrieb") {
+    return { fehler: "Dieser Zugang gehört nicht zu diesem Betrieb." };
+  }
+
+  let admin: ReturnType<typeof createAdminClient>;
+  try {
+    admin = createAdminClient();
+  } catch (fehler) {
+    return {
+      fehler: fehler instanceof Error ? fehler.message : "Unbekannter Fehler",
+    };
+  }
+
+  const { error: loeschfehler } = await admin.auth.admin.deleteUser(nutzerId);
+  if (loeschfehler) {
+    return { fehler: `Konnte nicht entfernt werden: ${loeschfehler.message}` };
+  }
+
+  revalidatePath(`/dashboard/betriebe/${betriebId}/zugaenge`);
+  return {};
+}

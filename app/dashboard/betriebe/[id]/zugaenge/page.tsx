@@ -1,7 +1,7 @@
+import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
-import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -14,8 +14,9 @@ import { holeAngemeldetenNutzer } from "@/lib/nutzer";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
-import { betriebsnutzerAnlegen } from "./actions";
+import { betriebsnutzerAnlegen, betriebsnutzerEntfernen } from "./actions";
 import { ZugangFormular } from "./zugang-formular";
+import { ZugangLoeschen } from "./zugang-loeschen";
 
 export const dynamic = "force-dynamic";
 
@@ -37,8 +38,6 @@ export default async function Zugaenge({
 
   if (!betrieb) notFound();
 
-  // Die Zuordnungen liest die gewöhnliche Verbindung - die Zugriffsregeln
-  // erlauben dem Admin das ohnehin.
   const { data: nutzerzeilen } = await supabase
     .from("nutzer")
     .select("id, name, angelegt_am")
@@ -56,60 +55,93 @@ export default async function Zugaenge({
   // heran - deshalb hier, und ausschließlich lesend.
   let emails = new Map<string, string>();
   let emailFehler: string | null = null;
-  try {
-    const admin = createAdminClient();
-    const ergebnisse = await Promise.all(
-      zeilen.map((z) => admin.auth.admin.getUserById(z.id)),
-    );
-    emails = new Map(
-      ergebnisse
-        .map((e) => e.data?.user)
-        .filter((u): u is NonNullable<typeof u> => Boolean(u))
-        .map((u) => [u.id, u.email ?? "—"]),
-    );
-  } catch (fehler) {
-    emailFehler =
-      fehler instanceof Error ? fehler.message : "Unbekannter Fehler";
+  if (zeilen.length > 0) {
+    try {
+      const admin = createAdminClient();
+      const ergebnisse = await Promise.all(
+        zeilen.map((z) => admin.auth.admin.getUserById(z.id)),
+      );
+      emails = new Map(
+        ergebnisse
+          .map((e) => e.data?.user)
+          .filter((u): u is NonNullable<typeof u> => Boolean(u))
+          .map((u) => [u.id, u.email ?? "—"]),
+      );
+    } catch (fehler) {
+      emailFehler =
+        fehler instanceof Error ? fehler.message : "Unbekannter Fehler";
+    }
   }
 
-  const anlegen = betriebsnutzerAnlegen.bind(null, betrieb.id);
-
   return (
-    <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-16">
-      <header className="mb-8 space-y-2">
-        <p className="text-sm text-muted-foreground">{betrieb.name}</p>
-        <h1 className="text-2xl font-semibold tracking-tight">Zugänge</h1>
-        <p className="text-sm text-muted-foreground">
-          Wer sich hier anmeldet, sieht ausschließlich die Anrufe dieses
+    <main className="auftauchen mx-auto w-full max-w-3xl flex-1 px-4 py-10 sm:px-6 sm:py-14">
+      <Link
+        href="/dashboard/betriebe"
+        className="mb-6 inline-flex items-center gap-1 rounded-md text-sm text-muted-foreground transition-colors hover:text-foreground"
+      >
+        <ChevronLeft className="size-4" />
+        Alle Betriebe
+      </Link>
+
+      <header className="mb-10 space-y-2">
+        <p className="font-mono text-xs tracking-wide text-muted-foreground uppercase">
+          {betrieb.name}
+        </p>
+        <h1 className="text-3xl font-semibold tracking-tight">Zugänge</h1>
+        <p className="max-w-prose text-sm text-muted-foreground">
+          Wer sich hiermit anmeldet, sieht ausschließlich die Anrufe dieses
           Betriebs. Dafür sorgen die Zugriffsregeln der Datenbank, nicht die
           Anwendung.
         </p>
       </header>
 
-      <section className="mb-10">
+      <section className="mb-12">
+        <h2 className="mb-3 text-sm font-medium">Vorhandene Zugänge</h2>
+
         {zeilen.length === 0 ? (
-          <div className="rounded-lg border bg-card p-6 text-center text-sm text-muted-foreground">
+          <p className="rounded-lg border border-dashed bg-card/50 px-5 py-8 text-center text-sm text-muted-foreground">
             Noch kein Zugang für diesen Betrieb.
-          </div>
+          </p>
         ) : (
           <div className="overflow-x-auto rounded-lg border">
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>E-Mail</TableHead>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Angelegt</TableHead>
+                  <TableHead className="hidden sm:table-cell">Name</TableHead>
+                  <TableHead className="hidden md:table-cell">
+                    Angelegt
+                  </TableHead>
+                  <TableHead />
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {zeilen.map((zeile) => (
                   <TableRow key={zeile.id}>
-                    <TableCell className="font-mono text-xs">
+                    <TableCell className="font-mono text-xs break-all">
                       {emails.get(zeile.id) ?? "—"}
+                      {/* Am Handy fehlen die eigenen Spalten - der Name
+                          rutscht deshalb unter die Adresse. */}
+                      {zeile.name ? (
+                        <span className="block text-muted-foreground sm:hidden">
+                          {zeile.name}
+                        </span>
+                      ) : null}
                     </TableCell>
-                    <TableCell>{zeile.name ?? "—"}</TableCell>
-                    <TableCell className="whitespace-nowrap text-muted-foreground">
+                    <TableCell className="hidden sm:table-cell">
+                      {zeile.name ?? "—"}
+                    </TableCell>
+                    <TableCell className="hidden font-mono text-xs whitespace-nowrap text-muted-foreground md:table-cell">
                       {new Date(zeile.angelegt_am).toLocaleDateString("de-AT")}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <ZugangLoeschen
+                        aktion={betriebsnutzerEntfernen.bind(
+                          null,
+                          betrieb.id,
+                          zeile.id,
+                        )}
+                      />
                     </TableCell>
                   </TableRow>
                 ))}
@@ -125,19 +157,13 @@ export default async function Zugaenge({
         ) : null}
       </section>
 
-      <section className="space-y-4">
-        <h2 className="text-sm font-medium">Neuen Zugang anlegen</h2>
-        <ZugangFormular aktion={anlegen} />
+      <section className="rounded-lg border bg-card p-5 sm:p-6">
+        <h2 className="mb-1 text-sm font-medium">Neuen Zugang anlegen</h2>
+        <p className="mb-5 text-sm text-muted-foreground">
+          Das Passwort wird erzeugt und danach einmalig angezeigt.
+        </p>
+        <ZugangFormular aktion={betriebsnutzerAnlegen.bind(null, betrieb.id)} />
       </section>
-
-      <div className="mt-10">
-        <Button
-          variant="ghost"
-          render={<Link href={`/dashboard/betriebe/${betrieb.id}`} />}
-        >
-          Zurück zum Betrieb
-        </Button>
-      </div>
     </main>
   );
 }

@@ -1,10 +1,34 @@
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { abmelden } from "@/app/login/actions";
-import { Button } from "@/components/ui/button";
 import { holeAngemeldetenNutzer } from "@/lib/nutzer";
 import { createClient } from "@/lib/supabase/server";
+
+export const dynamic = "force-dynamic";
+
+function Kachel({
+  titel,
+  text,
+  pfad,
+}: {
+  titel: string;
+  text: string;
+  pfad: string;
+}) {
+  return (
+    <Link
+      href={pfad}
+      className="group rounded-lg border bg-card p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lg focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
+    >
+      <div className="flex items-start justify-between gap-3">
+        <h2 className="text-lg font-medium tracking-tight">{titel}</h2>
+        <ArrowRight className="mt-1 size-4 shrink-0 text-muted-foreground transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-primary" />
+      </div>
+      <p className="mt-2 text-sm text-muted-foreground">{text}</p>
+    </Link>
+  );
+}
 
 export default async function Dashboard() {
   const supabase = await createClient();
@@ -19,64 +43,64 @@ export default async function Dashboard() {
   const nutzer = await holeAngemeldetenNutzer();
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col justify-center gap-8 px-6 py-20">
-      <header className="space-y-2">
-        <h1 className="text-3xl font-semibold tracking-tight">Angemeldet</h1>
-        <p className="text-muted-foreground">
+    <main className="auftauchen mx-auto w-full max-w-4xl flex-1 px-4 py-10 sm:px-6 sm:py-14">
+      <header className="mb-10 space-y-3">
+        <p className="font-mono text-xs tracking-wide text-muted-foreground uppercase">
+          {nutzer?.rolle === "admin" ? "Agenturinhaber" : "Betrieb"}
+        </p>
+        <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+          Übersicht
+        </h1>
+        <p className="max-w-prose text-muted-foreground">
           {nutzer?.rolle === "admin"
-            ? "Du bist als Agenturinhaber angemeldet und siehst alle Betriebe."
+            ? "Du siehst alle Betriebe und deren Anrufe."
             : nutzer
               ? "Du siehst ausschließlich die Daten deines Betriebs."
               : "Diesem Konto ist noch keine Rolle zugeordnet. Es sieht deshalb keine Daten."}
         </p>
       </header>
 
-      <dl className="rounded-lg border bg-card p-5 text-card-foreground">
-        <div className="flex flex-wrap justify-between gap-2 border-b py-2 first:pt-0">
-          <dt className="text-sm text-muted-foreground">E-Mail</dt>
-          <dd className="text-sm font-medium">{user.email}</dd>
-        </div>
-        <div className="flex flex-wrap justify-between gap-2 border-b py-2">
-          <dt className="text-sm text-muted-foreground">Rolle</dt>
-          <dd className="text-sm font-medium">
-            {nutzer?.rolle ?? "keine zugeordnet"}
-          </dd>
-        </div>
-        <div className="flex flex-wrap justify-between gap-2 py-2 last:pb-0">
-          <dt className="text-sm text-muted-foreground">Benutzerkennung</dt>
-          <dd className="font-mono text-xs">{user.id}</dd>
-        </div>
-      </dl>
-
       {nutzer ? (
-        <div className="flex flex-wrap gap-3">
-          <Button render={<Link href="/dashboard/anrufe" />}>
-            Anrufe und Auswertung
-          </Button>
+        <section className="mb-12 grid gap-4 sm:grid-cols-2">
+          <Kachel
+            titel="Anrufe und Auswertung"
+            text="Kennzahlen, Auftragswert je Kampagne und die letzten Anrufe."
+            pfad="/dashboard/anrufe"
+          />
           {nutzer.rolle === "admin" ? (
             <>
-              <Button
-                variant="outline"
-                render={<Link href="/dashboard/betriebe" />}
-              >
-                Betriebe verwalten
-              </Button>
-              <Button
-                variant="outline"
-                render={<Link href="/dashboard/sms-test" />}
-              >
-                SMS-Versand testen
-              </Button>
+              <Kachel
+                titel="Betriebe"
+                text="Betriebe anlegen, Wertstufen pflegen, Zugänge vergeben."
+                pfad="/dashboard/betriebe"
+              />
+              <Kachel
+                titel="SMS-Versand testen"
+                text="Bewertungslink für einen Anruf erzeugen."
+                pfad="/dashboard/sms-test"
+              />
             </>
           ) : null}
-        </div>
+        </section>
       ) : null}
 
-      <form action={abmelden}>
-        <Button type="submit" variant="outline">
-          Abmelden
-        </Button>
-      </form>
+      <section className="rounded-lg border bg-card p-5 sm:p-6">
+        <h2 className="mb-4 text-sm font-medium">Dein Konto</h2>
+        <dl className="space-y-3 text-sm">
+          <div className="flex flex-wrap justify-between gap-2 border-b border-border pb-3">
+            <dt className="text-muted-foreground">E-Mail</dt>
+            <dd className="font-mono text-xs break-all">{user.email}</dd>
+          </div>
+          <div className="flex flex-wrap justify-between gap-2 border-b border-border pb-3">
+            <dt className="text-muted-foreground">Rolle</dt>
+            <dd className="font-medium">{nutzer?.rolle ?? "keine zugeordnet"}</dd>
+          </div>
+          <div className="flex flex-wrap justify-between gap-2">
+            <dt className="text-muted-foreground">Kennung</dt>
+            <dd className="font-mono text-xs break-all">{user.id}</dd>
+          </div>
+        </dl>
+      </section>
     </main>
   );
 }

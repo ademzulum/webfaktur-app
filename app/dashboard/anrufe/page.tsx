@@ -53,11 +53,15 @@ function Kennzahl({
   zusatz?: string;
 }) {
   return (
-    <div className="rounded-lg border bg-card p-4 text-card-foreground">
-      <p className="text-sm text-muted-foreground">{titel}</p>
-      <p className="mt-1 text-2xl font-semibold tabular-nums">{wert}</p>
+    <div className="rounded-lg border bg-card p-4 text-card-foreground transition-colors hover:border-primary/30 sm:p-5">
+      <p className="font-mono text-xs tracking-wide text-muted-foreground uppercase">
+        {titel}
+      </p>
+      <p className="mt-2 font-mono text-2xl font-medium tabular-nums sm:text-3xl">
+        {wert}
+      </p>
       {zusatz ? (
-        <p className="mt-0.5 text-xs text-muted-foreground">{zusatz}</p>
+        <p className="mt-1 text-xs text-muted-foreground">{zusatz}</p>
       ) : null}
     </div>
   );
@@ -114,9 +118,9 @@ export default async function Anrufauswertung() {
     .slice(0, 8);
 
   return (
-    <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-16">
+    <main className="auftauchen mx-auto w-full max-w-5xl flex-1 px-4 py-10 sm:px-6 sm:py-14">
       <header className="mb-8 space-y-2">
-        <h1 className="text-2xl font-semibold tracking-tight">Anrufe</h1>
+        <h1 className="text-3xl font-semibold tracking-tight">Anrufe</h1>
         <p className="text-sm text-muted-foreground">
           {nutzer.rolle === "admin"
             ? "Alle Betriebe."
@@ -156,7 +160,7 @@ export default async function Anrufauswertung() {
 
           {kampagnendaten.length > 0 ? (
             <section className="rounded-lg border bg-card p-5 text-card-foreground">
-              <h2 className="text-sm font-medium">
+              <h2 className="font-mono text-xs tracking-wide text-muted-foreground uppercase">
                 Auftragswert je Kampagne
               </h2>
               <p className="mt-1 mb-4 text-xs text-muted-foreground">
@@ -175,9 +179,9 @@ export default async function Anrufauswertung() {
                   {nutzer.rolle === "admin" ? (
                     <TableHead>Betrieb</TableHead>
                   ) : null}
-                  <TableHead>Anrufer</TableHead>
-                  <TableHead>Kampagne</TableHead>
-                  <TableHead>Keyword</TableHead>
+                  <TableHead className="hidden sm:table-cell">Anrufer</TableHead>
+                  <TableHead className="hidden md:table-cell">Kampagne</TableHead>
+                  <TableHead className="hidden lg:table-cell">Keyword</TableHead>
                   <TableHead>Bewertung</TableHead>
                   <TableHead className="text-right">Wert</TableHead>
                 </TableRow>
@@ -187,25 +191,30 @@ export default async function Anrufauswertung() {
                   const bewertung = bewertungVon(anruf);
                   const betrieb = einzelwert(anruf.betriebe);
                   return (
-                    <TableRow key={anruf.id}>
-                      <TableCell className="whitespace-nowrap">
+                    <TableRow key={anruf.id} className="transition-colors hover:bg-muted/40">
+                      <TableCell className="font-mono text-xs whitespace-nowrap">
                         {new Date(anruf.beginn).toLocaleString("de-AT", {
                           day: "2-digit",
                           month: "2-digit",
                           hour: "2-digit",
                           minute: "2-digit",
                         })}
+                        {/* Am Handy fehlen eigene Spalten - Kampagne
+                            rutscht deshalb unter den Zeitpunkt. */}
+                        <span className="mt-1 block text-muted-foreground md:hidden">
+                          {anruf.kampagne ?? "—"}
+                        </span>
                       </TableCell>
                       {nutzer.rolle === "admin" ? (
                         <TableCell>{betrieb?.name ?? "—"}</TableCell>
                       ) : null}
-                      <TableCell className="whitespace-nowrap">
+                      <TableCell className="hidden font-mono text-xs whitespace-nowrap sm:table-cell">
                         {anruf.anrufer_nummer ?? "unbekannt"}
                       </TableCell>
-                      <TableCell className="text-muted-foreground">
+                      <TableCell className="hidden text-muted-foreground md:table-cell">
                         {anruf.kampagne ?? "—"}
                       </TableCell>
-                      <TableCell className="text-muted-foreground">
+                      <TableCell className="hidden text-muted-foreground lg:table-cell">
                         {anruf.keyword ?? "—"}
                       </TableCell>
                       <TableCell>
@@ -217,7 +226,7 @@ export default async function Anrufauswertung() {
                           </span>
                         )}
                       </TableCell>
-                      <TableCell className="text-right tabular-nums">
+                      <TableCell className="text-right font-mono text-xs tabular-nums">
                         {bewertung ? centAlsEuro(bewertung.wert_cent) : "—"}
                       </TableCell>
                     </TableRow>

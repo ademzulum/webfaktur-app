@@ -62,7 +62,7 @@ export function KampagnenDiagramm({ daten }: { daten: Kampagnenwert[] }) {
           />
           <Bar
             dataKey="cent"
-            fill="var(--color-chart-2)"
+            fill="var(--color-chart-1)"
             radius={[0, 4, 4, 0]}
             barSize={18}
             isAnimationActive={false}

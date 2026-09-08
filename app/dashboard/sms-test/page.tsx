@@ -43,9 +43,9 @@ export default async function SmsTest() {
   const anrufe = (data ?? []) as unknown as Anrufzeile[];
 
   return (
-    <main className="mx-auto w-full max-w-4xl flex-1 px-6 py-16">
+    <main className="auftauchen mx-auto w-full max-w-4xl flex-1 px-4 py-10 sm:px-6 sm:py-14">
       <header className="mb-8 space-y-2">
-        <h1 className="text-2xl font-semibold tracking-tight">
+        <h1 className="text-3xl font-semibold tracking-tight">
           SMS-Versand testen
         </h1>
         <p className="text-sm text-muted-foreground">
@@ -84,15 +84,15 @@ export default async function SmsTest() {
             <TableHeader>
               <TableRow>
                 <TableHead>Zeitpunkt</TableHead>
-                <TableHead>Betrieb</TableHead>
+                <TableHead className="hidden sm:table-cell">Betrieb</TableHead>
                 <TableHead>Anrufer</TableHead>
                 <TableHead />
               </TableRow>
             </TableHeader>
             <TableBody>
               {anrufe.map((anruf) => (
-                <TableRow key={anruf.id}>
-                  <TableCell className="whitespace-nowrap">
+                <TableRow key={anruf.id} className="transition-colors hover:bg-muted/40">
+                  <TableCell className="font-mono text-xs whitespace-nowrap">
                     {new Date(anruf.beginn).toLocaleString("de-AT", {
                       day: "2-digit",
                       month: "2-digit",
@@ -100,8 +100,8 @@ export default async function SmsTest() {
                       minute: "2-digit",
                     })}
                   </TableCell>
-                  <TableCell>{anruf.betriebe?.name ?? "—"}</TableCell>
-                  <TableCell className="whitespace-nowrap">
+                  <TableCell className="hidden sm:table-cell">{anruf.betriebe?.name ?? "—"}</TableCell>
+                  <TableCell className="font-mono text-xs whitespace-nowrap">
                     {anruf.anrufer_nummer ?? "unbekannt"}
                   </TableCell>
                   <TableCell className="text-right">

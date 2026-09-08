@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { DM_Mono, Geist, Newsreader } from "next/font/google";
+
 import "./globals.css";
 
 const geistSans = Geist({
@@ -7,9 +8,17 @@ const geistSans = Geist({
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const newsreader = Newsreader({
+  variable: "--font-newsreader",
   subsets: ["latin"],
+  display: "swap",
+});
+
+const dmMono = DM_Mono({
+  variable: "--font-dm-mono",
+  subsets: ["latin"],
+  weight: ["300", "400", "500"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -17,13 +26,41 @@ export const metadata: Metadata = {
   description: "Anrufe aus Google Ads bewerten und als Umsatz zurückmelden.",
 };
 
+/**
+ * Läuft, bevor die Seite gezeichnet wird.
+ *
+ * Ohne das würde beim Laden kurz die helle Ansicht aufblitzen, bevor React
+ * übernimmt - besonders unangenehm, weil dunkel die Voreinstellung ist.
+ * Deshalb bewusst ein einfaches Skript im Kopfbereich und nicht React.
+ */
+const themeSkript = `
+(function () {
+  try {
+    var gewaehlt = localStorage.getItem("webfaktur-theme");
+    if (gewaehlt === "hell") {
+      document.documentElement.classList.remove("dark");
+    } else {
+      document.documentElement.classList.add("dark");
+    }
+  } catch (e) {
+    document.documentElement.classList.add("dark");
+  }
+})();
+`;
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      lang="de"
+      // "dark" steht schon hier, damit der vom Server gelieferte Zustand der
+      // Voreinstellung entspricht und beim Laden nichts umspringt.
+      className={`dark ${geistSans.variable} ${newsreader.variable} ${dmMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeSkript }} />
+      </head>
+      <body className="flex min-h-full flex-col">{children}</body>
     </html>
   );
 }
