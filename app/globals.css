@@ -8,14 +8,23 @@
 
 @theme inline {
   /* ---- Schriften ------------------------------------------------------
-     Newsreader  Überschriften. Eine Serifenschrift, die den Seiten Ruhe gibt.
-     DM Mono     Zahlen, Kennzahlen, Beschriftungen. Gleiche Zeichenbreite,
-                 dadurch stehen Beträge in Tabellen sauber untereinander.
-     Geist Sans  Fließtext. Für längere Sätze am besten lesbar.
+     Nur zwei Schriften, wie im Erscheinungsbild festgelegt.
+
+     Newsreader  Überschriften UND Fließtext. Eine Lesetype - sie ist für
+                 längere Texte gemacht, nicht nur für Schlagzeilen.
+     DM Mono     Alles Technische: Zahlen, Beträge, Beschriftungen,
+                 Knöpfe, Tabellenköpfe. Gleiche Zeichenbreite, dadurch
+                 fluchten Beträge untereinander.
   */
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-newsreader);
   --font-heading: var(--font-newsreader);
   --font-mono: var(--font-dm-mono);
+
+  /* ---- Bewegung -------------------------------------------------------
+     Zwei Kurven für alles, damit sich die Oberfläche einheitlich anfühlt.
+  */
+  --ease-weich: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-federnd: cubic-bezier(0.34, 1.4, 0.64, 1);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -190,16 +199,41 @@
   .tabular-nums {
     font-variant-numeric: tabular-nums;
   }
+
+  /* Alles Technische in der Monospace: Knöpfe, Beschriftungen, Eingaben,
+     Tabellenköpfe. Das trennt Bedienelemente sichtbar vom Fließtext. */
+  button,
+  label,
+  input,
+  th {
+    @apply font-mono;
+  }
 }
 
 /* ==========================================================================
    BEWEGUNG
-   Zurückhaltend gehalten: kurze Wege, weiche Kurven, nichts, was hüpft.
+
+   Zwei Kurven für alles:
+     --ease-weich    Standard. Startet zügig, kommt sanft zum Stehen.
+     --ease-federnd  Schwingt am Ende leicht über. Für Dinge, die sich
+                     bewegen sollen wie etwas Lebendiges, nicht wie
+                     etwas Geschobenes.
    ========================================================================== */
 @keyframes auftauchen {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes heranwachsen {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.985);
   }
   to {
     opacity: 1;
@@ -209,13 +243,28 @@
 
 @layer utilities {
   .auftauchen {
-    animation: var(--animate-auftauchen);
+    animation: auftauchen 0.45s var(--ease-weich) both;
   }
 
-  /* Für Listen: jedes Element leicht versetzt. */
+  /* Für Listen: jedes Element etwas später als das vorige.
+     Der Versatz kommt über --verzoegerung, das im JSX gesetzt wird. */
   .auftauchen-gestaffelt > * {
-    animation: var(--animate-auftauchen);
-    animation-delay: calc(var(--index, 0) * 40ms);
+    animation: heranwachsen 0.5s var(--ease-weich) both;
+    animation-delay: calc(var(--verzoegerung, 0) * 55ms);
+  }
+
+  /* Sanfter Übergang für alles, was sich beim Überfahren ändert. */
+  .weich {
+    transition-property: color, background-color, border-color, transform,
+      opacity, box-shadow;
+    transition-duration: 260ms;
+    transition-timing-function: var(--ease-weich);
+  }
+
+  .federnd {
+    transition-property: transform, width, opacity;
+    transition-duration: 420ms;
+    transition-timing-function: var(--ease-federnd);
   }
 }
 

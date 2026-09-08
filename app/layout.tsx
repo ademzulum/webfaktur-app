@@ -1,12 +1,7 @@
 import type { Metadata } from "next";
-import { DM_Mono, Geist, Newsreader } from "next/font/google";
+import { DM_Mono, Newsreader } from "next/font/google";
 
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
 
 const newsreader = Newsreader({
   variable: "--font-newsreader",
@@ -54,7 +49,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="de"
       // "dark" steht schon hier, damit der vom Server gelieferte Zustand der
       // Voreinstellung entspricht und beim Laden nichts umspringt.
-      className={`dark ${geistSans.variable} ${newsreader.variable} ${dmMono.variable} h-full antialiased`}
+      className={`dark ${newsreader.variable} ${dmMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <head>

@@ -1,18 +1,11 @@
 import { redirect } from "next/navigation";
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { centAlsEuro } from "@/lib/geld";
 import { holeAngemeldetenNutzer } from "@/lib/nutzer";
 import { einzelwert } from "@/lib/postgrest";
 import { createClient } from "@/lib/supabase/server";
 
+import { AnrufKarte, type Anrufdaten } from "./anruf-karte";
 import { KampagnenDiagramm, type Kampagnenwert } from "./kampagnen-diagramm";
 
 export const dynamic = "force-dynamic";
@@ -34,13 +27,6 @@ type Anruf = {
   keyword: string | null;
   betriebe: { name: string } | { name: string }[] | null;
   bewertungen: Bewertung | Bewertung[] | null;
-};
-
-const BESCHRIFTUNG: Record<Bewertung["ergebnis"], string> = {
-  kein_auftrag: "Kein Auftrag",
-  klein: "Klein",
-  mittel: "Mittel",
-  gross: "Groß",
 };
 
 function Kennzahl({
@@ -171,69 +157,35 @@ export default async function Anrufauswertung() {
             </section>
           ) : null}
 
-          <section className="overflow-x-auto rounded-lg border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Zeitpunkt</TableHead>
-                  {nutzer.rolle === "admin" ? (
-                    <TableHead>Betrieb</TableHead>
-                  ) : null}
-                  <TableHead className="hidden sm:table-cell">Anrufer</TableHead>
-                  <TableHead className="hidden md:table-cell">Kampagne</TableHead>
-                  <TableHead className="hidden lg:table-cell">Keyword</TableHead>
-                  <TableHead>Bewertung</TableHead>
-                  <TableHead className="text-right">Wert</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {anrufe.slice(0, 50).map((anruf) => {
-                  const bewertung = bewertungVon(anruf);
-                  const betrieb = einzelwert(anruf.betriebe);
-                  return (
-                    <TableRow key={anruf.id} className="transition-colors hover:bg-muted/40">
-                      <TableCell className="font-mono text-xs whitespace-nowrap">
-                        {new Date(anruf.beginn).toLocaleString("de-AT", {
-                          day: "2-digit",
-                          month: "2-digit",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                        {/* Am Handy fehlen eigene Spalten - Kampagne
-                            rutscht deshalb unter den Zeitpunkt. */}
-                        <span className="mt-1 block text-muted-foreground md:hidden">
-                          {anruf.kampagne ?? "—"}
-                        </span>
-                      </TableCell>
-                      {nutzer.rolle === "admin" ? (
-                        <TableCell>{betrieb?.name ?? "—"}</TableCell>
-                      ) : null}
-                      <TableCell className="hidden font-mono text-xs whitespace-nowrap sm:table-cell">
-                        {anruf.anrufer_nummer ?? "unbekannt"}
-                      </TableCell>
-                      <TableCell className="hidden text-muted-foreground md:table-cell">
-                        {anruf.kampagne ?? "—"}
-                      </TableCell>
-                      <TableCell className="hidden text-muted-foreground lg:table-cell">
-                        {anruf.keyword ?? "—"}
-                      </TableCell>
-                      <TableCell>
-                        {bewertung ? (
-                          BESCHRIFTUNG[bewertung.ergebnis]
-                        ) : (
-                          <span className="text-muted-foreground">
-                            offen
-                          </span>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-right font-mono text-xs tabular-nums">
-                        {bewertung ? centAlsEuro(bewertung.wert_cent) : "—"}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
+          <section>
+            <h2 className="mb-4 font-mono text-xs tracking-wide text-muted-foreground uppercase">
+              Letzte Anrufe
+            </h2>
+            <div className="auftauchen-gestaffelt grid gap-3">
+              {anrufe.slice(0, 50).map((anruf, i) => {
+                const bewertung = bewertungVon(anruf);
+                const betrieb = einzelwert(anruf.betriebe);
+                const daten: Anrufdaten = {
+                  id: anruf.id,
+                  beginn: anruf.beginn,
+                  anrufer_nummer: anruf.anrufer_nummer,
+                  dauer_sekunden: anruf.dauer_sekunden,
+                  kampagne: anruf.kampagne,
+                  keyword: anruf.keyword,
+                  betrieb: nutzer.rolle === "admin" ? (betrieb?.name ?? null) : null,
+                  ergebnis: bewertung?.ergebnis ?? null,
+                  wert_cent: bewertung?.wert_cent ?? null,
+                };
+                return (
+                  <div
+                    key={anruf.id}
+                    style={{ "--verzoegerung": Math.min(i, 12) } as React.CSSProperties}
+                  >
+                    <AnrufKarte anruf={daten} />
+                  </div>
+                );
+              })}
+            </div>
           </section>
         </div>
       )}

@@ -3,14 +3,6 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { centAlsEuro } from "@/lib/geld";
 import { holeAngemeldetenNutzer } from "@/lib/nutzer";
 import { createClient } from "@/lib/supabase/server";
@@ -27,6 +19,19 @@ type Zeile = {
   wert_mittel_cent: number;
   wert_gross_cent: number;
 };
+
+function Wertstufe({ titel, cent }: { titel: string; cent: number }) {
+  return (
+    <div>
+      <p className="font-mono text-[0.65rem] tracking-wide text-muted-foreground uppercase">
+        {titel}
+      </p>
+      <p className="mt-0.5 font-mono text-sm tabular-nums">
+        {centAlsEuro(cent)}
+      </p>
+    </div>
+  );
+}
 
 export default async function BetriebeUebersicht() {
   const nutzer = await holeAngemeldetenNutzer();
@@ -45,7 +50,7 @@ export default async function BetriebeUebersicht() {
 
   return (
     <main className="auftauchen mx-auto w-full max-w-5xl flex-1 px-4 py-12 sm:px-6 sm:py-16">
-      <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
+      <header className="mb-10 flex flex-wrap items-end justify-between gap-4">
         <div className="space-y-2">
           <h1 className="text-3xl font-semibold tracking-tight">Betriebe</h1>
           <p className="font-mono text-xs text-muted-foreground">
@@ -63,7 +68,7 @@ export default async function BetriebeUebersicht() {
           Konnte nicht geladen werden: {error.message}
         </p>
       ) : betriebe.length === 0 ? (
-        <div className="rounded-lg border border-dashed bg-card/50 p-10 text-center">
+        <div className="rounded-xl border border-dashed bg-card/50 p-12 text-center">
           <p className="font-medium">Noch kein Betrieb angelegt.</p>
           <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
             Jeder Anruf gehört später genau einem Betrieb. Ohne mindestens
@@ -71,88 +76,64 @@ export default async function BetriebeUebersicht() {
           </p>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-lg border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead className="hidden sm:table-cell">Paket</TableHead>
-                <TableHead className="hidden sm:table-cell">Status</TableHead>
-                <TableHead className="hidden text-right lg:table-cell">
-                  Klein
-                </TableHead>
-                <TableHead className="hidden text-right lg:table-cell">
-                  Mittel
-                </TableHead>
-                <TableHead className="hidden text-right lg:table-cell">
-                  Groß
-                </TableHead>
-                <TableHead />
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {betriebe.map((betrieb) => (
-                <TableRow
-                  key={betrieb.id}
-                  className="transition-colors hover:bg-muted/40"
-                >
-                  <TableCell className="font-medium">
+        <div className="auftauchen-gestaffelt grid gap-4 lg:grid-cols-2">
+          {betriebe.map((betrieb, i) => (
+            <article
+              key={betrieb.id}
+              style={{ "--verzoegerung": Math.min(i, 12) } as React.CSSProperties}
+              className="weich flex flex-col gap-5 rounded-xl border bg-card p-5 hover:-translate-y-0.5 hover:border-primary/40 sm:p-6"
+            >
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <h2 className="text-xl font-medium tracking-tight">
                     {betrieb.name}
-                    {/* Am Handy fehlen die eigenen Spalten - Paket und
-                        Status rutschen deshalb unter den Namen. */}
-                    <span className="mt-1 block font-mono text-xs font-normal text-muted-foreground sm:hidden">
-                      {betrieb.paket}
-                      {" · "}
-                      {betrieb.aktiv ? "aktiv" : "stillgelegt"}
-                    </span>
-                  </TableCell>
-                  <TableCell className="hidden font-mono text-xs text-muted-foreground sm:table-cell">
+                  </h2>
+                  <p className="mt-1 font-mono text-xs text-muted-foreground">
                     {betrieb.paket}
-                  </TableCell>
-                  <TableCell className="hidden sm:table-cell">
-                    {betrieb.aktiv ? (
-                      <span className="text-emerald-600 dark:text-emerald-500">
-                        aktiv
-                      </span>
-                    ) : (
-                      <span className="text-muted-foreground">stillgelegt</span>
-                    )}
-                  </TableCell>
-                  <TableCell className="hidden text-right font-mono text-xs tabular-nums lg:table-cell">
-                    {centAlsEuro(betrieb.wert_klein_cent)}
-                  </TableCell>
-                  <TableCell className="hidden text-right font-mono text-xs tabular-nums lg:table-cell">
-                    {centAlsEuro(betrieb.wert_mittel_cent)}
-                  </TableCell>
-                  <TableCell className="hidden text-right font-mono text-xs tabular-nums lg:table-cell">
-                    {centAlsEuro(betrieb.wert_gross_cent)}
-                  </TableCell>
-                  <TableCell className="text-right whitespace-nowrap">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      render={
-                        <Link
-                          href={`/dashboard/betriebe/${betrieb.id}/zugaenge`}
-                        />
-                      }
-                    >
-                      Zugänge
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      render={
-                        <Link href={`/dashboard/betriebe/${betrieb.id}`} />
-                      }
-                    >
-                      Bearbeiten
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                    {betrieb.telefon ? <> &middot; {betrieb.telefon}</> : null}
+                  </p>
+                </div>
+
+                <span
+                  className={
+                    "shrink-0 rounded-full px-2.5 py-1 font-mono text-[0.7rem] " +
+                    (betrieb.aktiv
+                      ? "bg-primary/10 text-primary"
+                      : "bg-muted text-muted-foreground")
+                  }
+                >
+                  {betrieb.aktiv ? "aktiv" : "stillgelegt"}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3 border-y border-border py-4">
+                <Wertstufe titel="Klein" cent={betrieb.wert_klein_cent} />
+                <Wertstufe titel="Mittel" cent={betrieb.wert_mittel_cent} />
+                <Wertstufe titel="Groß" cent={betrieb.wert_gross_cent} />
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  render={
+                    <Link href={`/dashboard/betriebe/${betrieb.id}`} />
+                  }
+                >
+                  Bearbeiten
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  render={
+                    <Link href={`/dashboard/betriebe/${betrieb.id}/zugaenge`} />
+                  }
+                >
+                  Zugänge
+                </Button>
+              </div>
+            </article>
+          ))}
         </div>
       )}
     </main>
