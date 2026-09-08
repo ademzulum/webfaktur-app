@@ -203,7 +203,10 @@ export default async function Bewertungsseite({
         >
           <summary className="weich flex h-16 cursor-pointer list-none items-center justify-between px-5 text-base hover:bg-muted/40">
             <span>Anderer Betrag</span>
-            <span className="weich text-sm text-muted-foreground group-open:rotate-45">
+            {/* Dasselbe Zeichen die ganze Zeit: Ein Plus, das sich um 45
+                Grad dreht, IST ein Kreuz. Zwei ausgetauschte Zeichen
+                würden springen. */}
+            <span className="weich text-lg text-muted-foreground group-open:rotate-45">
               +
             </span>
           </summary>

@@ -277,8 +277,13 @@
 
   /* Sanfter Übergang für alles, was sich beim Überfahren ändert. */
   .weich {
+    /* "rotate" und "scale" stehen bewusst mit dabei: In Tailwind sind das
+       seit Version 4 eigene Eigenschaften und nicht mehr Teil von
+       "transform". Ohne sie hier würde ein gedrehtes Zeichen springen
+       statt sich zu drehen. */
     transition-property:
-      color, background-color, border-color, transform, opacity, box-shadow;
+      color, background-color, border-color, transform, rotate, scale, opacity,
+      box-shadow;
     transition-duration: 260ms;
     transition-timing-function: var(--ease-weich);
   }
@@ -379,6 +384,46 @@
 .dark .umschalt-strahlen {
   opacity: 1;
   transform: scale(1) rotate(0deg);
+}
+
+/* ==========================================================================
+   AUFKLAPPBARE BEREICHE
+
+   Das Dreieck des Browsers wird ausgeblendet - wir zeigen ein eigenes
+   Zeichen, das sich beim Aufklappen zum Kreuz dreht.
+
+   Das Aufgleiten selbst: Der Browser kann die Höhe eines Bereichs
+   normalerweise nicht weich verändern, solange sie "automatisch" ist - er
+   kennt das Ziel ja erst, wenn er fertig gerechnet hat. "interpolate-size"
+   erlaubt ihm genau das.
+
+   Browser, die das noch nicht können, klappen weiterhin auf einen Schlag
+   auf. Es fehlt dann nur die Bewegung, nichts an der Bedienung.
+   ========================================================================== */
+summary {
+  list-style: none;
+}
+summary::-webkit-details-marker {
+  display: none;
+}
+
+details {
+  interpolate-size: allow-keywords;
+}
+
+::details-content {
+  block-size: 0;
+  overflow: hidden;
+  /* "allow-discrete" sorgt dafür, dass der Inhalt beim Zuklappen erst am
+     ENDE verschwindet statt sofort - sonst würde ein leerer Kasten
+     zusammenfahren. */
+  transition:
+    block-size 380ms var(--ease-weich),
+    content-visibility 380ms allow-discrete;
+}
+
+details[open]::details-content {
+  block-size: auto;
 }
 
 /* Wer im Betriebssystem "Bewegung reduzieren" eingeschaltet hat, bekommt
