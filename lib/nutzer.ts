@@ -18,15 +18,20 @@ export type AngemeldeterNutzer = {
 export async function holeAngemeldetenNutzer(): Promise<AngemeldeterNutzer | null> {
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
+  // Bewusst getClaims() statt getUser(): getUser() fragt bei jedem Aufruf
+  // beim Supabase-Server nach, getClaims() prüft die Unterschrift des
+  // Anmeldenachweises vor Ort. Da proxy.ts unmittelbar davor schon geprüft
+  // hat, wären das sonst zwei Netzanfragen für dieselbe Auskunft.
+  //
+  // "sub" ist die Kennung des angemeldeten Kontos.
+  const { data: nachweis } = await supabase.auth.getClaims();
+  const kennung = nachweis?.claims?.sub;
+  if (!kennung) return null;
 
   const { data } = await supabase
     .from("nutzer")
     .select("id, rolle, betrieb_id, name")
-    .eq("id", user.id)
+    .eq("id", kennung)
     .maybeSingle();
 
   return (data as AngemeldeterNutzer | null) ?? null;

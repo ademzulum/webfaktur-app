@@ -34,22 +34,31 @@ export async function proxy(request: NextRequest) {
     },
   );
 
-  // Fragt den Supabase-Server, ob die Sitzung echt und gültig ist.
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // Prüft, ob die Sitzung echt und gültig ist.
+  //
+  // Bewusst getClaims() und nicht getUser(): getUser() fragt jedes Mal beim
+  // Supabase-Server nach - eine Anfrage übers Netz bei JEDEM Seitenaufruf.
+  // getClaims() prüft die Unterschrift des Anmeldenachweises statt dessen
+  // vor Ort und kommt ohne Netzanfrage aus. Abgelaufene Sitzungen werden
+  // dabei weiterhin erneuert.
+  //
+  // Bewusst NICHT getSession(): Das liest den Keks, ohne irgendetwas zu
+  // prüfen. Wer den Keks fälscht, wäre damit angemeldet. Auf dem Server ist
+  // getSession() deshalb tabu.
+  const { data: nachweis } = await supabase.auth.getClaims();
+  const angemeldet = Boolean(nachweis?.claims?.sub);
 
   const pfad = request.nextUrl.pathname;
 
   // Geschützter Bereich ohne Anmeldung -> zur Anmeldeseite
-  if (!user && pfad.startsWith("/dashboard")) {
+  if (!angemeldet && pfad.startsWith("/dashboard")) {
     const ziel = request.nextUrl.clone();
     ziel.pathname = "/login";
     return NextResponse.redirect(ziel);
   }
 
   // Bereits angemeldet -> Anmeldeseite überspringen
-  if (user && pfad === "/login") {
+  if (angemeldet && pfad === "/login") {
     const ziel = request.nextUrl.clone();
     ziel.pathname = "/dashboard";
     return NextResponse.redirect(ziel);
