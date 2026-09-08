@@ -45,6 +45,12 @@ export function Filterreihe({
           <Link
             key={option.wert}
             href={`${pfad}?${felder.toString()}`}
+            // Ohne das springt die Seite bei jedem Umschalten nach oben.
+            // Next.js scrollt bei einem Seitenwechsel standardmäßig an den
+            // Anfang - richtig, wenn man wirklich woandershin geht, falsch
+            // beim Filtern: Da bleibt man auf derselben Seite und will die
+            // Knöpfe weiter vor sich haben.
+            scroll={false}
             aria-current={gewaehlt ? "true" : undefined}
             // Die Umschaltung läuft über einen Seitenwechsel. React
             // behält dabei diese Verweise und tauscht nur ihre Klassen aus -
