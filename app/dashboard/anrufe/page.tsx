@@ -38,7 +38,7 @@ type Anruf = {
 };
 
 type Zustand = "alle" | "offen" | "auftrag" | "kein";
-type Sortierung = "neu" | "wert" | "alt";
+type Sortierung = "neu" | "alt" | "dauer";
 
 /**
  * Holt einen Wert aus der Adresse und lässt nur Erlaubtes durch.
@@ -70,7 +70,7 @@ export default async function Anrufauswertung({
   );
   const sortierung = nurErlaubt<Sortierung>(
     felder.sortierung,
-    ["neu", "wert", "alt"],
+    ["neu", "alt", "dauer"],
     "neu",
   );
 
@@ -134,11 +134,22 @@ export default async function Anrufauswertung({
     return true;
   };
 
-  const wertVon = (a: Anruf) => bewertungVon(a)?.wert_cent ?? -1;
-
   const gefiltert = anrufe.filter(passt);
   const sortiert = [...gefiltert].sort((a, b) => {
-    if (sortierung === "wert") return wertVon(b) - wertVon(a);
+    // Nach Gesprächsdauer statt nach Auftragswert.
+    //
+    // Der Auftragswert kennt nur drei Beträge - die Wertstufen, die der
+    // Betrieb selbst eingestellt hat. Danach zu sortieren hätte nur alle
+    // großen Aufträge nach oben geholt, also genau das, was der Filter
+    // "Aufträge" ohnehin schon kann.
+    //
+    // Die Dauer ist dagegen echte Messung mit vielen Abstufungen. Vor allem
+    // bei den noch offenen Anrufen ist sie der beste Hinweis darauf, welche
+    // sich zu bewerten lohnen: Ein vierminütiges Gespräch war meist eine
+    // ernsthafte Anfrage, ein zwanzig Sekunden langes selten.
+    if (sortierung === "dauer") {
+      return (b.dauer_sekunden ?? -1) - (a.dauer_sekunden ?? -1);
+    }
     const zeitA = new Date(a.beginn).getTime();
     const zeitB = new Date(b.beginn).getTime();
     return sortierung === "alt" ? zeitA - zeitB : zeitB - zeitA;
@@ -248,7 +259,7 @@ export default async function Anrufauswertung({
                 optionen={[
                   { wert: "neu", titel: "Neueste" },
                   { wert: "alt", titel: "Älteste" },
-                  { wert: "wert", titel: "Höchster Wert" },
+                  { wert: "dauer", titel: "Längste Gespräche" },
                 ]}
               />
             </div>

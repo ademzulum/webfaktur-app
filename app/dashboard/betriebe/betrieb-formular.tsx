@@ -245,13 +245,22 @@ export function BetriebFormular({
         </p>
       ) : null}
 
-      <div className="flex flex-wrap items-center gap-3 pt-2">
-        <Button type="submit" size="lg" disabled={laeuft}>
+      {/* Kein Umbruch: Die beiden gehoeren zusammen und stehen deshalb
+          nebeneinander. Am Telefon teilen sie sich die Breite, ab Tablet
+          nehmen sie nur so viel wie noetig. */}
+      <div className="flex items-center gap-3 pt-2">
+        <Button
+          type="submit"
+          size="lg"
+          disabled={laeuft}
+          className="flex-1 sm:flex-none"
+        >
           {laeuft ? "Wird gespeichert …" : knopfbeschriftung}
         </Button>
         <Button
           variant="ghost"
           size="lg"
+          className="flex-1 sm:flex-none"
           render={<Link href="/dashboard/betriebe" />}
         >
           Abbrechen

@@ -88,7 +88,11 @@ export default async function BetriebeUebersicht() {
               }
               className="karte flex flex-col gap-5 rounded-xl border bg-card p-5 hover:border-primary/40 hover:bg-muted/20 sm:p-6"
             >
-              <div className="flex flex-wrap items-start justify-between gap-3">
+              {/* Bewusst OHNE Umbruch: Mit "flex-wrap" rutschte die
+                  Zustandsmarke bei einem langen Firmennamen unter den Namen,
+                  als gehoerte sie zum Text. Sie gehoert aber an den Rand.
+                  Der Name darf stattdessen selbst umbrechen. */}
+              <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <h2 className="text-xl font-medium tracking-tight">
                     {betrieb.name}
