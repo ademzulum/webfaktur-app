@@ -228,21 +228,19 @@ reset role;
 
 
 -- ---------------------------------------------------------------------------
--- 6. Ergebnis
--- ---------------------------------------------------------------------------
-select * from public.kostenergebnis order by nr;
-
-
--- ---------------------------------------------------------------------------
--- 7. Zusätzlich: Stehen die Regeln überhaupt, und sind sie scharf?
+-- 6. Stehen die Regeln überhaupt scharf?
 --
 -- "zeilenregeln_an" muss bei beiden Tabellen true sein. Ohne das wären die
 -- Regeln darunter nur Zierde.
+--
+-- Diese Abfragen stehen BEWUSST vor dem eigentlichen Ergebnis: Der
+-- SQL-Editor zeigt bei mehreren Abfragen nur die letzte an. Das Wichtigste
+-- gehört deshalb ans Ende.
 -- ---------------------------------------------------------------------------
 select
-  c.relname                                  as tabelle,
-  c.relrowsecurity                           as zeilenregeln_an,
-  c.relforcerowsecurity                      as gilt_auch_fuer_eigentuemer,
+  c.relname             as tabelle,
+  c.relrowsecurity      as zeilenregeln_an,
+  c.relforcerowsecurity as gilt_auch_fuer_eigentuemer,
   (select count(*) from pg_policies p
     where p.schemaname = 'public' and p.tablename = c.relname) as anzahl_regeln
 from pg_class c
@@ -261,6 +259,16 @@ from pg_policies
 where schemaname = 'public'
   and tablename in ('preiskonfiguration', 'zahlungen')
 order by tablename, cmd, policyname;
+
+
+-- ---------------------------------------------------------------------------
+-- 7. DAS ERGEBNIS -- das ist die Tabelle, auf die es ankommt
+--
+-- Zeilen 1 und 2: überall 0, auch bei "davon_eigene".
+-- Zeile 3: der Admin sieht alles - sonst wäre die Regel zu streng.
+-- Zeilen 4 und 5: Schreibversuche abgewiesen.
+-- ---------------------------------------------------------------------------
+select * from public.kostenergebnis order by nr;
 
 
 -- ---------------------------------------------------------------------------
