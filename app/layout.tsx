@@ -1,5 +1,7 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { DM_Mono, Newsreader } from "next/font/google";
+
+import { Hintergrunddienst } from "@/components/hintergrunddienst";
 
 import "./globals.css";
 
@@ -21,7 +23,26 @@ const dmMono = DM_Mono({
 
 export const metadata: Metadata = {
   title: "Webfaktur",
-  description: "Anrufe aus Google Ads bewerten und als Umsatz zurückmelden.",
+  description:
+    "Anrufe aus Google Ads bewerten und als Auftragswert zurückmelden.",
+
+  // Sorgt dafür, dass sich Webfaktur auf dem iPhone wie eine App verhält:
+  // ohne Adressleiste, mit eigenem Namen unter dem Symbol. Apple wertet das
+  // Manifest dafür nicht aus, es braucht diese eigenen Angaben.
+  appleWebApp: {
+    capable: true,
+    title: "Webfaktur",
+    statusBarStyle: "black",
+  },
+};
+
+/**
+ * Die Farbe der Systemleiste, wenn Webfaktur vom Startbildschirm gestartet
+ * wird. Bewusst der dunkle Hintergrund: Dunkel ist die Voreinstellung, und
+ * die Leiste soll nahtlos in die Seite übergehen.
+ */
+export const viewport: Viewport = {
+  themeColor: "#0a0a0b",
 };
 
 /**
@@ -58,7 +79,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeSkript }} />
       </head>
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        {children}
+        <Hintergrunddienst />
+      </body>
     </html>
   );
 }

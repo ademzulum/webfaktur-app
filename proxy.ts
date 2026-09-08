@@ -62,7 +62,12 @@ export const config = {
   // Läuft auf allen Seiten AUSSER auf Dateien wie Bildern, Schriften und
   // Skripten. Ohne diese Ausnahme würde der Torwächter auch das Laden von
   // Bildern und CSS abfangen.
+  //
+  // sw.js und manifest.webmanifest sind ebenfalls ausgenommen. Beide werden
+  // vom Telefon selbst geholt, ohne Anmeldung - und der Hintergrunddienst
+  // wird bei JEDEM Seitenaufruf erneut geprüft. Ihn durch die Sitzungs-
+  // prüfung zu schicken, wäre reine Verschwendung.
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|sw\\.js|manifest\\.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
   ],
 };
