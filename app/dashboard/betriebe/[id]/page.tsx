@@ -1,3 +1,5 @@
+import { ChevronLeft } from "lucide-react";
+import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import { centFuerEingabe } from "@/lib/geld";
@@ -45,10 +47,25 @@ export default async function BetriebBearbeiten({
   const aktualisieren = betriebAktualisieren.bind(null, betrieb.id);
 
   return (
-    <main className="mx-auto w-full max-w-2xl flex-1 px-6 py-16">
-      <h1 className="mb-8 text-2xl font-semibold tracking-tight">
-        {betrieb.name}
-      </h1>
+    <main className="auftauchen mx-auto w-full max-w-2xl flex-1 px-4 py-12 sm:px-6 sm:py-16">
+      <Link
+        href="/dashboard/betriebe"
+        className="mb-6 inline-flex items-center gap-1 rounded-md text-sm text-muted-foreground transition-colors hover:text-foreground"
+      >
+        <ChevronLeft className="size-4" />
+        Alle Betriebe
+      </Link>
+      <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+        <h1 className="text-3xl font-semibold tracking-tight">
+          {betrieb.name}
+        </h1>
+        <Link
+          href={`/dashboard/betriebe/${betrieb.id}/zugaenge`}
+          className="text-sm text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
+        >
+          Zugänge verwalten
+        </Link>
+      </div>
       <BetriebFormular
         aktion={aktualisieren}
         knopfbeschriftung="Änderungen speichern"

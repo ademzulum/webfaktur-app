@@ -118,7 +118,7 @@ export default async function Anrufauswertung() {
     .slice(0, 8);
 
   return (
-    <main className="auftauchen mx-auto w-full max-w-5xl flex-1 px-4 py-10 sm:px-6 sm:py-14">
+    <main className="auftauchen mx-auto w-full max-w-5xl flex-1 px-4 py-12 sm:px-6 sm:py-16">
       <header className="mb-8 space-y-2">
         <h1 className="text-3xl font-semibold tracking-tight">Anrufe</h1>
         <p className="text-sm text-muted-foreground">

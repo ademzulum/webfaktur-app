@@ -74,7 +74,7 @@ export default async function Zugaenge({
   }
 
   return (
-    <main className="auftauchen mx-auto w-full max-w-3xl flex-1 px-4 py-10 sm:px-6 sm:py-14">
+    <main className="auftauchen mx-auto w-full max-w-3xl flex-1 px-4 py-12 sm:px-6 sm:py-16">
       <Link
         href="/dashboard/betriebe"
         className="mb-6 inline-flex items-center gap-1 rounded-md text-sm text-muted-foreground transition-colors hover:text-foreground"
