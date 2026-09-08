@@ -62,6 +62,19 @@
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
 
+  /* ---- Eckenradius ----------------------------------------------------
+     Alles leitet sich aus --radius ab, damit nichts aus der Reihe fällt.
+
+     rounded-xl   Flächen: Karten, Abschnitte, Kästen um Bedienelemente
+     rounded-lg   Bedienelemente: Knöpfe, Eingabefelder, gleitende
+                  Markierungen, Kennzeichen
+     rounded-full NUR für Dinge, die tatsächlich rund sind: Punkte,
+                  Kippschalter, Balkenenden
+
+     Ein Kasten außen bekommt einen größeren Radius als das, was darin
+     liegt - sonst wirken die Ecken innen eckiger als außen. Bei 4 Pixeln
+     Innenabstand geht xl (14) mit lg (10) genau auf.
+  */
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -69,7 +82,6 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
-
 }
 
 /* ==========================================================================
@@ -265,8 +277,8 @@
 
   /* Sanfter Übergang für alles, was sich beim Überfahren ändert. */
   .weich {
-    transition-property: color, background-color, border-color, transform,
-      opacity, box-shadow;
+    transition-property:
+      color, background-color, border-color, transform, opacity, box-shadow;
     transition-duration: 260ms;
     transition-timing-function: var(--ease-weich);
   }

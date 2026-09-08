@@ -105,7 +105,7 @@ export default async function BetriebeUebersicht() {
 
                 <span
                   className={
-                    "shrink-0 rounded-full px-2.5 py-1 font-mono text-[0.7rem] " +
+                    "shrink-0 rounded-lg px-2.5 py-1 font-mono text-[0.7rem] " +
                     (betrieb.aktiv
                       ? "bg-primary/10 text-primary"
                       : "bg-muted text-muted-foreground")

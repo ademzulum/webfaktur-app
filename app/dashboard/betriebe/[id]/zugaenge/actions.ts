@@ -63,7 +63,9 @@ export async function betriebsnutzerAnlegen(
   // pauschal "nicht gefunden" zu melden, hat schon einmal eine halbe Stunde
   // Suche gekostet - der Betrieb existierte, nur der Zugriff scheiterte.
   if (lesefehler) {
-    return { fehler: `Betrieb konnte nicht geprüft werden: ${lesefehler.message}` };
+    return {
+      fehler: `Betrieb konnte nicht geprüft werden: ${lesefehler.message}`,
+    };
   }
   if (!betrieb) return { fehler: "Betrieb nicht gefunden." };
 
@@ -152,7 +154,9 @@ export async function betriebsnutzerEntfernen(
     .maybeSingle();
 
   if (lesefehler) {
-    return { fehler: `Zugang konnte nicht geprüft werden: ${lesefehler.message}` };
+    return {
+      fehler: `Zugang konnte nicht geprüft werden: ${lesefehler.message}`,
+    };
   }
   if (!zeile) return { fehler: "Zugang nicht gefunden." };
   if (zeile.betrieb_id !== betriebId || zeile.rolle !== "betrieb") {

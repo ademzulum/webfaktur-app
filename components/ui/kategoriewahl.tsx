@@ -67,7 +67,7 @@ export function Kategoriewahl({
       <span
         ref={markierungRef}
         aria-hidden
-        className="pointer-events-none absolute top-0 left-0 rounded-full bg-muted opacity-0"
+        className="pointer-events-none absolute top-0 left-0 rounded-lg bg-muted opacity-0"
         style={{ transition: MARKIERUNG_UEBERGANG }}
       />
 
@@ -105,7 +105,7 @@ export function Kategoriewahl({
             onFocus={(e) => bewegeZu(e.currentTarget)}
             aria-current={gewaehlt ? "true" : undefined}
             className={
-              "weich relative z-10 shrink-0 rounded-full px-3.5 py-2 text-sm " +
+              "weich relative z-10 shrink-0 rounded-lg px-3.5 py-2 text-sm " +
               (gewaehlt
                 ? "text-foreground"
                 : "text-muted-foreground hover:text-foreground")

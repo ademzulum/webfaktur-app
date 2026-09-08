@@ -59,7 +59,9 @@ function leseFelder(formular: FormData): Betriebsfelder | string {
   return {
     name,
     telefon: leerZuNull(formular.get("telefon")),
-    google_ads_kundennummer: leerZuNull(formular.get("google_ads_kundennummer")),
+    google_ads_kundennummer: leerZuNull(
+      formular.get("google_ads_kundennummer"),
+    ),
     paket: String(formular.get("paket") ?? "").trim() || "basis",
     aktiv: formular.get("aktiv") === "on",
     wert_klein_cent: klein,

@@ -45,7 +45,7 @@ function dauerLesbar(sekunden: number | null): string {
 function Kennzeichen({ ergebnis }: { ergebnis: Anrufdaten["ergebnis"] }) {
   if (ergebnis === null) {
     return (
-      <span className="inline-flex items-center gap-2 rounded-full border border-dashed px-2.5 py-1 text-xs text-muted-foreground">
+      <span className="inline-flex items-center gap-2 rounded-lg border border-dashed px-2.5 py-1 text-xs text-muted-foreground">
         <span className="size-1.5 rounded-full border border-muted-foreground" />
         Noch nicht bewertet
       </span>
@@ -57,7 +57,7 @@ function Kennzeichen({ ergebnis }: { ergebnis: Anrufdaten["ergebnis"] }) {
   return (
     <span
       className={
-        "inline-flex items-center gap-2 rounded-full border px-2.5 py-1 text-xs " +
+        "inline-flex items-center gap-2 rounded-lg border px-2.5 py-1 text-xs " +
         (auftrag
           ? "border-primary/30 bg-primary/10 text-primary"
           : "border-transparent bg-muted text-muted-foreground")
