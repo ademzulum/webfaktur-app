@@ -69,6 +69,7 @@ export default async function BetriebBearbeiten({
       <BetriebFormular
         aktion={aktualisieren}
         knopfbeschriftung="Änderungen speichern"
+        knopfkurz="Speichern"
         betrieb={{
           id: betrieb.id,
           name: betrieb.name,

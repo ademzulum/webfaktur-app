@@ -101,7 +101,12 @@ export function Auswahlreihe({
           />
           <span
             data-feld={option.wert}
-            className="weich block cursor-pointer rounded-lg px-4 py-2 text-sm text-muted-foreground peer-checked:text-foreground peer-focus-visible:ring-3 peer-focus-visible:ring-ring/50 hover:text-foreground"
+            // "foreground/10" statt einer festen grauen Farbe: In der
+            // dunklen Ansicht ist das zehn Prozent Weiß und hellt auf, in
+            // der hellen zehn Prozent Schwarz und dunkelt ab. Eine feste
+            // Farbe wäre in einer der beiden Ansichten kaum zu sehen -
+            // genau das war vorher das Problem.
+            className="weich block cursor-pointer rounded-lg px-4 py-2 text-sm text-muted-foreground peer-checked:text-foreground peer-focus-visible:ring-3 peer-focus-visible:ring-ring/50 hover:bg-foreground/10 hover:text-foreground"
           >
             {option.titel}
           </span>

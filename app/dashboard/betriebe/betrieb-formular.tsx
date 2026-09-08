@@ -133,6 +133,7 @@ export function BetriebFormular({
   aktion,
   betrieb,
   knopfbeschriftung,
+  knopfkurz,
 }: {
   aktion: (
     zustand: FormularZustand,
@@ -140,6 +141,8 @@ export function BetriebFormular({
   ) => Promise<FormularZustand>;
   betrieb?: Betrieb;
   knopfbeschriftung: string;
+  /** Kürzere Fassung für das Telefon. Ohne Angabe gilt die lange. */
+  knopfkurz?: string;
 }) {
   const [zustand, absenden, laeuft] = useActionState(aktion, startzustand);
 
@@ -245,22 +248,37 @@ export function BetriebFormular({
         </p>
       ) : null}
 
-      {/* Kein Umbruch: Die beiden gehoeren zusammen und stehen deshalb
-          nebeneinander. Am Telefon teilen sie sich die Breite, ab Tablet
-          nehmen sie nur so viel wie noetig. */}
+      {/* Die beiden gehören zusammen und stehen deshalb nebeneinander.
+          Am Telefon teilen sie sich die Breite, ab Tablet nehmen sie nur
+          so viel wie nötig.
+
+          "shrink" hebt eine Vorgabe des Knopfes auf: Knöpfe weigern sich
+          von Haus aus, schmaler zu werden als ihre Beschriftung. In einer
+          Reihe zu zweit hieß das, dass sie die Zeile aufgeschoben haben -
+          und die Seite ließ sich seitlich wegschieben. */}
       <div className="flex items-center gap-3 pt-2">
         <Button
           type="submit"
-          size="lg"
           disabled={laeuft}
-          className="flex-1 sm:flex-none"
+          className="h-11 flex-1 shrink px-4 sm:h-12 sm:flex-none sm:px-6 sm:text-base"
         >
-          {laeuft ? "Wird gespeichert …" : knopfbeschriftung}
+          {laeuft ? (
+            "Wird gespeichert …"
+          ) : (
+            <>
+              {/* Am Telefon die kurze Fassung. Nicht aus Platznot allein -
+                  auf einem Knopf, den man ohnehin nur einmal drückt, ist
+                  ein Wort so verständlich wie drei. */}
+              <span className="sm:hidden">
+                {knopfkurz ?? knopfbeschriftung}
+              </span>
+              <span className="hidden sm:inline">{knopfbeschriftung}</span>
+            </>
+          )}
         </Button>
         <Button
-          variant="ghost"
-          size="lg"
-          className="flex-1 sm:flex-none"
+          variant="secondary"
+          className="h-11 flex-1 shrink px-4 sm:h-12 sm:flex-none sm:px-6 sm:text-base"
           render={<Link href="/dashboard/betriebe" />}
         >
           Abbrechen
