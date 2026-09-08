@@ -51,7 +51,7 @@ export function AnrufKarte({ anruf }: { anruf: Anrufdaten }) {
   });
 
   return (
-    <article className="weich group relative overflow-hidden rounded-xl border bg-card p-4 hover:-translate-y-0.5 hover:border-primary/40 hover:bg-muted/30 sm:p-5">
+    <article className="karte group relative overflow-hidden rounded-xl border bg-card p-4 hover:border-primary/40 hover:bg-muted/30 sm:p-5">
       {/* Streifen links: orange bei Auftrag, blass bei "kein Auftrag",
           gar nicht sichtbar solange offen. */}
       <span

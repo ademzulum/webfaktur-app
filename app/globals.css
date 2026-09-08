@@ -10,13 +10,13 @@
   /* ---- Schriften ------------------------------------------------------
      Nur zwei Schriften, wie im Erscheinungsbild festgelegt.
 
-     Newsreader  Überschriften UND Fließtext. Eine Lesetype - sie ist für
-                 längere Texte gemacht, nicht nur für Schlagzeilen.
-     DM Mono     Alles Technische: Zahlen, Beträge, Beschriftungen,
-                 Knöpfe, Tabellenköpfe. Gleiche Zeichenbreite, dadurch
-                 fluchten Beträge untereinander.
+     Newsreader  AUSSCHLIESSLICH Überschriften. Sie ist der Akzent,
+                 nicht die Grundschrift - sonst verliert sie ihre Wirkung.
+     DM Mono     Alles andere: Fließtext, Zahlen, Beträge, Beschriftungen,
+                 Knöpfe, Tabellen. Gleiche Zeichenbreite, dadurch fluchten
+                 Beträge untereinander.
   */
-  --font-sans: var(--font-newsreader);
+  --font-sans: var(--font-dm-mono);
   --font-heading: var(--font-newsreader);
   --font-mono: var(--font-dm-mono);
 
@@ -188,7 +188,8 @@
     scrollbar-gutter: stable;
   }
 
-  /* Überschriften in der Serifenschrift der Marke. */
+  /* Nur die Überschriften tragen die Serifenschrift der Marke. Das ist der
+     einzige Ort, an dem Newsreader vorkommt. */
   h1,
   h2,
   h3 {
@@ -200,14 +201,8 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* Alles Technische in der Monospace: Knöpfe, Beschriftungen, Eingaben,
-     Tabellenköpfe. Das trennt Bedienelemente sichtbar vom Fließtext. */
-  button,
-  label,
-  input,
-  th {
-    @apply font-mono;
-  }
+  /* Keine eigene Regel mehr für Knöpfe, Beschriftungen und Eingaben:
+     Die Grundschrift IST jetzt DM Mono, damit erben sie sie ohnehin. */
 }
 
 /* ==========================================================================
@@ -259,6 +254,34 @@
       opacity, box-shadow;
     transition-duration: 260ms;
     transition-timing-function: var(--ease-weich);
+  }
+
+  /* Karten und Kacheln.
+     Eigene Regel statt ".weich", weil hier zwei Dinge unterschiedlich
+     schnell laufen sollen: Die Anhebung braucht Zeit, damit sie weich
+     wirkt, die Farben dürfen schneller sein. Beides in einer einzigen
+     Dauer sah abgehackt aus.
+
+     "will-change" sagt dem Browser vorher Bescheid, dass sich die
+     Position ändert. Er legt die Karte dann auf eine eigene Ebene und
+     muss beim Überfahren nicht neu rechnen - das ist der eigentliche
+     Grund, warum es vorher stockte. */
+  .karte {
+    transition-property: transform, border-color, background-color, box-shadow;
+    transition-duration: 480ms, 300ms, 300ms, 480ms;
+    transition-timing-function: var(--ease-weich);
+    will-change: transform;
+  }
+
+  .karte:hover {
+    transform: translateY(-4px);
+  }
+
+  /* Beim Loslassen darf es einen Tick schneller zurückgehen als hin -
+     das fühlt sich an wie etwas, das man wirklich angehoben hat. */
+  .karte:active {
+    transform: translateY(-1px);
+    transition-duration: 120ms;
   }
 
   .federnd {

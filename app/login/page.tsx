@@ -12,24 +12,35 @@ import { anmelden, type Anmeldezustand } from "./actions";
 
 const startzustand: Anmeldezustand = {};
 
+/**
+ * Die Anmeldung ist zugleich die Startseite: Wer die Adresse aufruft,
+ * landet hier. Deshalb steht die Wortmarke gross über dem Feld - es ist
+ * das Erste, was man von Webfaktur sieht.
+ */
 export default function Anmeldeseite() {
   const [zustand, aktion, laeuft] = useActionState(anmelden, startzustand);
 
   return (
     <div className="flex flex-1 flex-col">
-      <div className="flex justify-end p-4">
+      <div className="flex justify-end p-4 sm:p-6">
         <ThemeUmschalter />
       </div>
 
       <main className="auftauchen mx-auto flex w-full max-w-sm flex-1 flex-col justify-center px-5 pb-24">
-        <Wortmarke className="mb-10 h-6 w-auto self-start" />
+        <div className="mb-10 flex flex-col items-center text-center">
+          <Wortmarke className="h-7 w-auto" />
+          <h1 className="mt-8 text-3xl font-semibold tracking-tight">
+            Anmelden
+          </h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Zugang zu deinem Bereich.
+          </p>
+        </div>
 
-        <h1 className="text-2xl font-semibold tracking-tight">Anmelden</h1>
-        <p className="mt-2 mb-8 text-sm text-muted-foreground">
-          Zugang zu deinem Webfaktur-Bereich.
-        </p>
-
-        <form action={aktion} className="space-y-5">
+        <form
+          action={aktion}
+          className="space-y-5 rounded-xl border bg-card p-6 sm:p-7"
+        >
           <div className="space-y-2">
             <Label htmlFor="email">E-Mail</Label>
             <Input
@@ -65,7 +76,8 @@ export default function Anmeldeseite() {
 
           <Button
             type="submit"
-            className="h-11 w-full transition-all"
+            size="lg"
+            className="w-full"
             disabled={laeuft}
           >
             {laeuft ? "Wird geprüft …" : "Anmelden"}

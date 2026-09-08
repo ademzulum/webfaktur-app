@@ -51,7 +51,7 @@ function Kennzahlkachel({
     <Link
       href={pfad}
       className={
-        "weich group flex flex-col justify-between gap-6 rounded-xl border bg-card p-5 hover:-translate-y-0.5 hover:border-primary/50 hover:bg-muted/30 focus-visible:border-primary/50 focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none sm:p-6 " +
+        "karte group flex flex-col justify-between gap-6 rounded-xl border bg-card p-5 hover:border-primary/50 hover:bg-muted/30 focus-visible:border-primary/50 focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none sm:p-6 " +
         (hervorgehoben ? "border-primary/40" : "")
       }
     >

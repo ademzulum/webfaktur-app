@@ -81,7 +81,7 @@ export default async function BetriebeUebersicht() {
             <article
               key={betrieb.id}
               style={{ "--verzoegerung": Math.min(i, 12) } as React.CSSProperties}
-              className="weich flex flex-col gap-5 rounded-xl border bg-card p-5 hover:-translate-y-0.5 hover:border-primary/40 sm:p-6"
+              className="karte flex flex-col gap-5 rounded-xl border bg-card p-5 hover:border-primary/40 hover:bg-muted/20 sm:p-6"
             >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
