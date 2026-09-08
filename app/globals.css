@@ -88,11 +88,14 @@
   --popover: #ffffff;
   --popover-foreground: #171719;
 
-  /* Markenfarbe als Hauptfarbe. Die Textfarbe darauf ist bewusst dunkel:
-     Weiß auf diesem Orange erreicht nur 3,5:1 Kontrast und wäre für
-     Fließtext zu schwach. Dunkel erreicht 5,6:1. */
+  /* Markenfarbe als Hauptfarbe, Schrift darauf weiß - in beiden Ansichten
+     gleich, weil die Fläche selbst in beiden Ansichten gleich ist.
+     Zur Einordnung: Weiß auf diesem Orange erreicht 3,5:1 Kontrast. Das
+     genügt für Bedienelemente, liegt aber unter den 4,5:1, die für
+     Fließtext gefordert sind. Deshalb steht auf orangenen Flächen nur
+     kurze Knopfbeschriftung, nie längerer Text. */
   --primary: #ed570d;
-  --primary-foreground: #0a0a0b;
+  --primary-foreground: #ffffff;
 
   --secondary: #f4f4f5;
   --secondary-foreground: #171719;
@@ -118,7 +121,7 @@
   --sidebar: #fafafa;
   --sidebar-foreground: #171719;
   --sidebar-primary: #ed570d;
-  --sidebar-primary-foreground: #0a0a0b;
+  --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #f4f4f5;
   --sidebar-accent-foreground: #171719;
   --sidebar-border: #e4e4e7;
@@ -142,7 +145,7 @@
   --popover-foreground: #fafafa;
 
   --primary: #ed570d;
-  --primary-foreground: #0a0a0b;
+  --primary-foreground: #ffffff;
 
   --secondary: #1e1e21;
   --secondary-foreground: #fafafa;
@@ -166,7 +169,7 @@
   --sidebar: #0f0f11;
   --sidebar-foreground: #fafafa;
   --sidebar-primary: #ed570d;
-  --sidebar-primary-foreground: #0a0a0b;
+  --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #1e1e21;
   --sidebar-accent-foreground: #fafafa;
   --sidebar-border: #27272b;
@@ -222,6 +225,20 @@
   to {
     opacity: 1;
     transform: none;
+  }
+}
+
+/* Balken wachsen von links heran.
+   Bewusst über "scaleX" und nicht über die Breite: Die Zielbreite steht als
+   Prozentwert im HTML und ist für jeden Balken anders. Eine Animation kann
+   diesen Wert nicht lesen - eine Skalierung von 0 auf 1 dagegen führt
+   immer zur richtigen Endbreite, egal wie breit der Balken ist. */
+@keyframes balkenwachsen {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
   }
 }
 
@@ -284,11 +301,64 @@
     transition-duration: 120ms;
   }
 
+  .balken {
+    transform-origin: left;
+    animation: balkenwachsen 0.7s var(--ease-weich) both;
+    animation-delay: calc(var(--verzoegerung, 0) * 70ms);
+  }
+
   .federnd {
     transition-property: transform, width, opacity;
     transition-duration: 420ms;
     transition-timing-function: var(--ease-federnd);
   }
+}
+
+/* ==========================================================================
+   SONNE UND MOND
+
+   Kein Austausch zweier Symbole, sondern eine durchgehende Verwandlung -
+   dasselbe Prinzip wie beim Menüzeichen.
+
+   Der Trick liegt in der Maske: Ein zweiter Kreis knabbert eine Sichel aus
+   der Scheibe. Fährt er weg, bleibt eine volle Scheibe übrig, und die
+   Strahlen fahren aus. Bewegt wird ausschließlich über "transform" - das
+   ist die einzige Eigenschaft, die für SVG in allen Browsern zuverlässig
+   animiert wird.
+   ========================================================================== */
+.umschalt-maske,
+.umschalt-kern,
+.umschalt-strahlen {
+  transition:
+    transform 520ms var(--ease-weich),
+    opacity 320ms var(--ease-weich);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* Hell: Mond. Die Maske sitzt über der Scheibe, die Strahlen sind eingefahren. */
+.umschalt-maske {
+  transform: translate(0, 0);
+}
+.umschalt-kern {
+  transform: scale(1);
+}
+.umschalt-strahlen {
+  opacity: 0;
+  transform: scale(0.35) rotate(-70deg);
+}
+
+/* Dunkel: Sonne. Die Maske fährt aus dem Bild, die Scheibe wird kleiner,
+   die Strahlen drehen sich heraus. */
+.dark .umschalt-maske {
+  transform: translate(11px, -11px);
+}
+.dark .umschalt-kern {
+  transform: scale(0.58);
+}
+.dark .umschalt-strahlen {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
 }
 
 /* Wer im Betriebssystem "Bewegung reduzieren" eingeschaltet hat, bekommt

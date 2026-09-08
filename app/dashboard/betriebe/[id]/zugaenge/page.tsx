@@ -96,7 +96,9 @@ export default async function Zugaenge({
       </header>
 
       <section className="mb-12">
-        <h2 className="mb-3 text-sm font-medium">Vorhandene Zugänge</h2>
+        <h2 className="mb-3 text-xs tracking-wide text-muted-foreground uppercase">
+          Vorhandene Zugänge
+        </h2>
 
         {zeilen.length === 0 ? (
           <p className="rounded-lg border border-dashed bg-card/50 px-5 py-8 text-center text-sm text-muted-foreground">
@@ -158,7 +160,9 @@ export default async function Zugaenge({
       </section>
 
       <section className="rounded-lg border bg-card p-5 sm:p-6">
-        <h2 className="mb-1 text-sm font-medium">Neuen Zugang anlegen</h2>
+        <h2 className="mb-1 text-xs tracking-wide text-muted-foreground uppercase">
+          Neuen Zugang anlegen
+        </h2>
         <p className="mb-5 text-sm text-muted-foreground">
           Das Passwort wird erzeugt und danach einmalig angezeigt.
         </p>

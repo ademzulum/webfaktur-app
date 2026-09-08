@@ -58,11 +58,7 @@ export function AnrufKarte({ anruf }: { anruf: Anrufdaten }) {
         aria-hidden
         className={
           "weich absolute inset-y-0 left-0 w-[3px] " +
-          (auftrag
-            ? "bg-primary"
-            : bewertet
-              ? "bg-border"
-              : "bg-transparent")
+          (auftrag ? "bg-primary" : bewertet ? "bg-border" : "bg-transparent")
         }
       />
 
@@ -106,8 +102,7 @@ export function AnrufKarte({ anruf }: { anruf: Anrufdaten }) {
           {anruf.keyword ? (
             <>
               {" "}
-              &middot;{" "}
-              <span className="font-mono">{anruf.keyword}</span>
+              &middot; <span className="font-mono">{anruf.keyword}</span>
             </>
           ) : null}
         </p>

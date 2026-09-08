@@ -89,7 +89,9 @@ export default async function Bewertungsseite({
     return (
       <main className={rahmen}>
         <Hinweis
-          symbol={<CheckCircle2 className="size-10 text-emerald-600 dark:text-emerald-500" />}
+          symbol={
+            <CheckCircle2 className="size-10 text-emerald-600 dark:text-emerald-500" />
+          }
           titel="Bereits bewertet"
           text="Dieser Anruf wurde schon bewertet. Vielen Dank - es ist nichts weiter zu tun."
         />
@@ -99,9 +101,21 @@ export default async function Bewertungsseite({
 
   const stufen = [
     { wert: "kein_auftrag", beschriftung: "Kein Auftrag", betrag: null },
-    { wert: "klein", beschriftung: "Kleiner Auftrag", betrag: eintrag.wert_klein_cent },
-    { wert: "mittel", beschriftung: "Mittlerer Auftrag", betrag: eintrag.wert_mittel_cent },
-    { wert: "gross", beschriftung: "Großer Auftrag", betrag: eintrag.wert_gross_cent },
+    {
+      wert: "klein",
+      beschriftung: "Kleiner Auftrag",
+      betrag: eintrag.wert_klein_cent,
+    },
+    {
+      wert: "mittel",
+      beschriftung: "Mittlerer Auftrag",
+      betrag: eintrag.wert_mittel_cent,
+    },
+    {
+      wert: "gross",
+      beschriftung: "Großer Auftrag",
+      betrag: eintrag.wert_gross_cent,
+    },
   ] as const;
 
   const zeitpunkt = new Date(eintrag.beginn).toLocaleString("de-AT", {
@@ -122,7 +136,9 @@ export default async function Bewertungsseite({
           Ist aus diesem Anruf ein Auftrag geworden?
         </h1>
         <div className="rounded-lg border bg-card px-4 py-3 text-sm">
-          <p className="font-mono font-medium">{eintrag.anrufer_nummer ?? "Nummer unbekannt"}</p>
+          <p className="font-mono font-medium">
+            {eintrag.anrufer_nummer ?? "Nummer unbekannt"}
+          </p>
           <p className="mt-0.5 font-mono text-xs text-muted-foreground">
             {zeitpunkt} Uhr · {dauerLesbar(eintrag.dauer_sekunden)}
           </p>

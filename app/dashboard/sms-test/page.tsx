@@ -50,8 +50,8 @@ export default async function SmsTest() {
         </h1>
         <p className="text-sm text-muted-foreground">
           Erzeugt einen echten Bewertungslink für einen Anruf. Solange matelso
-          fehlt, ist das der einzige Auslöser — später übernimmt das der
-          Webhook zwei Minuten nach Gesprächsende.
+          fehlt, ist das der einzige Auslöser — später übernimmt das der Webhook
+          zwei Minuten nach Gesprächsende.
         </p>
 
         {process.env.SMS_TESTMODUS === "an" ? (
@@ -59,9 +59,9 @@ export default async function SmsTest() {
             <p className="font-medium">Testmodus aktiv</p>
             <p className="mt-1 text-muted-foreground">
               Es wird keine SMS verschickt. Der erzeugte Link erscheint
-              stattdessen zum Anklicken. Token, Ablage und Gültigkeit sind
-              dabei echt — nur der Versandweg entfällt. Abschalten über
-              SMS_TESTMODUS in .env.local.
+              stattdessen zum Anklicken. Token, Ablage und Gültigkeit sind dabei
+              echt — nur der Versandweg entfällt. Abschalten über SMS_TESTMODUS
+              in .env.local.
             </p>
           </div>
         ) : null}
@@ -91,7 +91,10 @@ export default async function SmsTest() {
             </TableHeader>
             <TableBody>
               {anrufe.map((anruf) => (
-                <TableRow key={anruf.id} className="transition-colors hover:bg-muted/40">
+                <TableRow
+                  key={anruf.id}
+                  className="transition-colors hover:bg-muted/40"
+                >
                   <TableCell className="font-mono text-xs whitespace-nowrap">
                     {new Date(anruf.beginn).toLocaleString("de-AT", {
                       day: "2-digit",
@@ -100,7 +103,9 @@ export default async function SmsTest() {
                       minute: "2-digit",
                     })}
                   </TableCell>
-                  <TableCell className="hidden sm:table-cell">{anruf.betriebe?.name ?? "—"}</TableCell>
+                  <TableCell className="hidden sm:table-cell">
+                    {anruf.betriebe?.name ?? "—"}
+                  </TableCell>
                   <TableCell className="font-mono text-xs whitespace-nowrap">
                     {anruf.anrufer_nummer ?? "unbekannt"}
                   </TableCell>

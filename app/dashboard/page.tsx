@@ -1,7 +1,7 @@
-import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { Kennzahlkachel } from "@/components/kennzahl";
 import { centAlsEuro } from "@/lib/geld";
 import { holeAngemeldetenNutzer } from "@/lib/nutzer";
 import { einzelwert } from "@/lib/postgrest";
@@ -26,55 +26,6 @@ type Anruf = {
   betriebe: { name: string } | { name: string }[] | null;
   bewertungen: Bewertung | Bewertung[] | null;
 };
-
-/**
- * Kachel mit einer Zahl.
- *
- * Bewusst KEIN Schatten beim Überfahren: Auf dem fast schwarzen Hintergrund
- * ist ein Schatten unsichtbar. Sichtbar sind Rahmenfarbe und Flächenhelligkeit,
- * und zwar in beiden Ansichten.
- */
-function Kennzahlkachel({
-  titel,
-  wert,
-  zusatz,
-  pfad,
-  hervorgehoben,
-}: {
-  titel: string;
-  wert: string;
-  zusatz: string;
-  pfad: string;
-  hervorgehoben?: boolean;
-}) {
-  return (
-    <Link
-      href={pfad}
-      className={
-        "karte group flex flex-col justify-between gap-6 rounded-xl border bg-card p-5 hover:border-primary/50 hover:bg-muted/30 focus-visible:border-primary/50 focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none sm:p-6 " +
-        (hervorgehoben ? "border-primary/40" : "")
-      }
-    >
-      <div className="flex items-start justify-between gap-3">
-        <p className="font-mono text-xs tracking-wide text-muted-foreground uppercase">
-          {titel}
-        </p>
-        <ArrowUpRight className="weich size-4 shrink-0 text-muted-foreground group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-primary" />
-      </div>
-      <div>
-        <p
-          className={
-            "font-mono text-3xl font-medium tabular-nums sm:text-4xl " +
-            (hervorgehoben ? "text-primary" : "")
-          }
-        >
-          {wert}
-        </p>
-        <p className="mt-1.5 text-sm text-muted-foreground">{zusatz}</p>
-      </div>
-    </Link>
-  );
-}
 
 export default async function Dashboard() {
   const nutzer = await holeAngemeldetenNutzer();
@@ -138,43 +89,43 @@ export default async function Dashboard() {
       </header>
 
       <section className="auftauchen-gestaffelt grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div style={{ "--verzoegerung": 0 } as React.CSSProperties}>
-          <Kennzahlkachel
-            titel="Anrufe"
-            wert={String(anrufe)}
-            zusatz="insgesamt erfasst"
-            pfad="/dashboard/anrufe"
-          />
-        </div>
-        <div style={{ "--verzoegerung": 1 } as React.CSSProperties}>
-          <Kennzahlkachel
-            titel="Offen"
-            wert={String(offen)}
-            zusatz={offen === 0 ? "alles bewertet" : "warten auf Bewertung"}
-            pfad="/dashboard/anrufe"
-            hervorgehoben={offen > 0}
-          />
-        </div>
-        <div style={{ "--verzoegerung": 2 } as React.CSSProperties}>
-          <Kennzahlkachel
-            titel="Aufträge"
-            wert={String(auftraege)}
-            zusatz={`Bewertungsquote ${quote}`}
-            pfad="/dashboard/anrufe"
-          />
-        </div>
-        <div style={{ "--verzoegerung": 3 } as React.CSSProperties}>
-          <Kennzahlkachel
-            titel="Auftragswert"
-            wert={centAlsEuro(summe)}
-            zusatz={
+        {[
+          {
+            titel: "Anrufe",
+            wert: String(anrufe),
+            zusatz: "insgesamt erfasst",
+            pfad: "/dashboard/anrufe",
+          },
+          {
+            titel: "Offen",
+            wert: String(offen),
+            zusatz: offen === 0 ? "alles bewertet" : "warten auf Bewertung",
+            pfad: "/dashboard/anrufe",
+            hervorgehoben: offen > 0,
+          },
+          {
+            titel: "Aufträge",
+            wert: String(auftraege),
+            zusatz: `Bewertungsquote ${quote}`,
+            pfad: "/dashboard/anrufe",
+          },
+          {
+            titel: "Auftragswert",
+            wert: centAlsEuro(summe),
+            zusatz:
               nutzer.rolle === "admin"
                 ? `über ${betriebe} ${betriebe === 1 ? "Betrieb" : "Betriebe"}`
-                : "aus allen Bewertungen"
-            }
-            pfad="/dashboard/anrufe"
-          />
-        </div>
+                : "aus allen Bewertungen",
+            pfad: "/dashboard/anrufe",
+          },
+        ].map((kachel, i) => (
+          <div
+            key={kachel.titel}
+            style={{ "--verzoegerung": i } as React.CSSProperties}
+          >
+            <Kennzahlkachel {...kachel} />
+          </div>
+        ))}
       </section>
 
       {letzteAnrufe.length > 0 ? (

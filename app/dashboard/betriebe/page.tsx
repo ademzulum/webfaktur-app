@@ -54,7 +54,9 @@ export default async function BetriebeUebersicht() {
         <div className="space-y-2">
           <h1 className="text-3xl font-semibold tracking-tight">Betriebe</h1>
           <p className="font-mono text-xs text-muted-foreground">
-            {betriebe.length === 1 ? "1 Betrieb" : `${betriebe.length} Betriebe`}
+            {betriebe.length === 1
+              ? "1 Betrieb"
+              : `${betriebe.length} Betriebe`}
           </p>
         </div>
         <Button render={<Link href="/dashboard/betriebe/neu" />}>
@@ -71,8 +73,8 @@ export default async function BetriebeUebersicht() {
         <div className="rounded-xl border border-dashed bg-card/50 p-12 text-center">
           <p className="font-medium">Noch kein Betrieb angelegt.</p>
           <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
-            Jeder Anruf gehört später genau einem Betrieb. Ohne mindestens
-            einen Betrieb kann kein Anruf gespeichert werden.
+            Jeder Anruf gehört später genau einem Betrieb. Ohne mindestens einen
+            Betrieb kann kein Anruf gespeichert werden.
           </p>
         </div>
       ) : (
@@ -80,7 +82,9 @@ export default async function BetriebeUebersicht() {
           {betriebe.map((betrieb, i) => (
             <article
               key={betrieb.id}
-              style={{ "--verzoegerung": Math.min(i, 12) } as React.CSSProperties}
+              style={
+                { "--verzoegerung": Math.min(i, 12) } as React.CSSProperties
+              }
               className="karte flex flex-col gap-5 rounded-xl border bg-card p-5 hover:border-primary/40 hover:bg-muted/20 sm:p-6"
             >
               <div className="flex flex-wrap items-start justify-between gap-3">
@@ -116,9 +120,7 @@ export default async function BetriebeUebersicht() {
                 <Button
                   variant="outline"
                   size="sm"
-                  render={
-                    <Link href={`/dashboard/betriebe/${betrieb.id}`} />
-                  }
+                  render={<Link href={`/dashboard/betriebe/${betrieb.id}`} />}
                 >
                   Bearbeiten
                 </Button>

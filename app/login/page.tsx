@@ -27,15 +27,15 @@ export default function Anmeldeseite() {
       </div>
 
       <main className="auftauchen mx-auto flex w-full max-w-sm flex-1 flex-col justify-center px-5 pb-24">
-        <div className="mb-10 flex flex-col items-center text-center">
-          <Wortmarke className="h-7 w-auto" />
-          <h1 className="mt-8 text-3xl font-semibold tracking-tight">
-            Anmelden
-          </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Zugang zu deinem Bereich.
-          </p>
+        {/* Nur die Wortmarke. Erklärender Text ist hier überflüssig - wer
+            hier landet, weiß, wo er ist und was er tun soll.
+            Die Überschrift bleibt trotzdem im Dokument, nur unsichtbar:
+            Vorleseprogramme und Suchmaschinen brauchen sie, um die Seite
+            benennen zu können. */}
+        <div className="mb-12 flex justify-center">
+          <Wortmarke className="h-11 w-auto sm:h-14" />
         </div>
+        <h1 className="sr-only">Anmelden</h1>
 
         <form
           action={aktion}
@@ -74,12 +74,7 @@ export default function Anmeldeseite() {
             </p>
           ) : null}
 
-          <Button
-            type="submit"
-            size="lg"
-            className="w-full"
-            disabled={laeuft}
-          >
+          <Button type="submit" size="lg" className="w-full" disabled={laeuft}>
             {laeuft ? "Wird geprüft …" : "Anmelden"}
           </Button>
         </form>

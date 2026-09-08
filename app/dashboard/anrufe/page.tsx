@@ -5,8 +5,10 @@ import { holeAngemeldetenNutzer } from "@/lib/nutzer";
 import { einzelwert } from "@/lib/postgrest";
 import { createClient } from "@/lib/supabase/server";
 
+import { Kennzahlkachel } from "@/components/kennzahl";
+
 import { AnrufKarte, type Anrufdaten } from "./anruf-karte";
-import { KampagnenDiagramm, type Kampagnenwert } from "./kampagnen-diagramm";
+import { KampagnenBalken, type Kampagnenwert } from "./kampagnen-balken";
 
 export const dynamic = "force-dynamic";
 
@@ -28,30 +30,6 @@ type Anruf = {
   betriebe: { name: string } | { name: string }[] | null;
   bewertungen: Bewertung | Bewertung[] | null;
 };
-
-function Kennzahl({
-  titel,
-  wert,
-  zusatz,
-}: {
-  titel: string;
-  wert: string;
-  zusatz?: string;
-}) {
-  return (
-    <div className="rounded-lg border bg-card p-4 text-card-foreground transition-colors hover:border-primary/30 sm:p-5">
-      <p className="font-mono text-xs tracking-wide text-muted-foreground uppercase">
-        {titel}
-      </p>
-      <p className="mt-2 font-mono text-2xl font-medium tabular-nums sm:text-3xl">
-        {wert}
-      </p>
-      {zusatz ? (
-        <p className="mt-1 text-xs text-muted-foreground">{zusatz}</p>
-      ) : null}
-    </div>
-  );
-}
 
 export default async function Anrufauswertung() {
   const nutzer = await holeAngemeldetenNutzer();
@@ -129,31 +107,40 @@ export default async function Anrufauswertung() {
         </div>
       ) : (
         <div className="space-y-10">
-          <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <Kennzahl titel="Anrufe" wert={String(anrufe.length)} />
-            <Kennzahl
-              titel="Bewertet"
-              wert={String(bewertet.length)}
-              zusatz={`${anteil(bewertet.length, anrufe.length)} der Anrufe`}
-            />
-            <Kennzahl
-              titel="Aufträge"
-              wert={String(auftraege.length)}
-              zusatz={`${anteil(auftraege.length, bewertet.length)} der Bewertungen`}
-            />
-            <Kennzahl titel="Auftragswert" wert={centAlsEuro(wertSumme)} />
+          <section className="auftauchen-gestaffelt grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { titel: "Anrufe", wert: String(anrufe.length) },
+              {
+                titel: "Bewertet",
+                wert: String(bewertet.length),
+                zusatz: `${anteil(bewertet.length, anrufe.length)} der Anrufe`,
+              },
+              {
+                titel: "Aufträge",
+                wert: String(auftraege.length),
+                zusatz: `${anteil(auftraege.length, bewertet.length)} der Bewertungen`,
+              },
+              { titel: "Auftragswert", wert: centAlsEuro(wertSumme) },
+            ].map((kachel, i) => (
+              <div
+                key={kachel.titel}
+                style={{ "--verzoegerung": i } as React.CSSProperties}
+              >
+                <Kennzahlkachel {...kachel} />
+              </div>
+            ))}
           </section>
 
           {kampagnendaten.length > 0 ? (
-            <section className="rounded-lg border bg-card p-5 text-card-foreground">
+            <section className="rounded-xl border bg-card p-5 text-card-foreground sm:p-6">
               <h2 className="font-mono text-xs tracking-wide text-muted-foreground uppercase">
                 Auftragswert je Kampagne
               </h2>
-              <p className="mt-1 mb-4 text-xs text-muted-foreground">
-                Summe der bewerteten Aufträge. Zum Überfahren für die Anzahl
-                der Anrufe.
+              <p className="mt-1 mb-6 text-xs text-muted-foreground">
+                Summe der bewerteten Aufträge. Der längste Balken ist die
+                stärkste Kampagne, alle anderen richten sich danach.
               </p>
-              <KampagnenDiagramm daten={kampagnendaten} />
+              <KampagnenBalken daten={kampagnendaten} />
             </section>
           ) : null}
 
@@ -172,14 +159,19 @@ export default async function Anrufauswertung() {
                   dauer_sekunden: anruf.dauer_sekunden,
                   kampagne: anruf.kampagne,
                   keyword: anruf.keyword,
-                  betrieb: nutzer.rolle === "admin" ? (betrieb?.name ?? null) : null,
+                  betrieb:
+                    nutzer.rolle === "admin" ? (betrieb?.name ?? null) : null,
                   ergebnis: bewertung?.ergebnis ?? null,
                   wert_cent: bewertung?.wert_cent ?? null,
                 };
                 return (
                   <div
                     key={anruf.id}
-                    style={{ "--verzoegerung": Math.min(i, 12) } as React.CSSProperties}
+                    style={
+                      {
+                        "--verzoegerung": Math.min(i, 12),
+                      } as React.CSSProperties
+                    }
                   >
                     <AnrufKarte anruf={daten} />
                   </div>

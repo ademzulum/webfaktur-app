@@ -18,9 +18,7 @@ export function SmsKnopf({
   const [zustand, absenden, laeuft] = useActionState(aktion, startzustand);
 
   if (deaktiviert) {
-    return (
-      <span className="text-sm text-muted-foreground">{deaktiviert}</span>
-    );
+    return <span className="text-sm text-muted-foreground">{deaktiviert}</span>;
   }
 
   return (

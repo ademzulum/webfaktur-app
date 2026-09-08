@@ -35,7 +35,10 @@ export function ZugangLoeschen({
           Entfernen
         </Button>
         {zustand.fehler ? (
-          <span role="alert" className="max-w-56 text-right text-xs text-destructive">
+          <span
+            role="alert"
+            className="max-w-56 text-right text-xs text-destructive"
+          >
             {zustand.fehler}
           </span>
         ) : null}

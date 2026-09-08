@@ -7,9 +7,7 @@ export default function Danke() {
         <div className="flex justify-center">
           <CheckCircle2 className="size-12 text-emerald-600 dark:text-emerald-500" />
         </div>
-        <h1 className="mt-4 text-2xl font-semibold tracking-tight">
-          Danke!
-        </h1>
+        <h1 className="mt-4 text-2xl font-semibold tracking-tight">Danke!</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Die Bewertung ist gespeichert. Du kannst dieses Fenster schließen.
         </p>

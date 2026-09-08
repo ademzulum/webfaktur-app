@@ -29,9 +29,9 @@ export function ZugangFormular({
         <div>
           <h2 className="font-medium">Zugang angelegt</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Bitte jetzt notieren und dem Betrieb übermitteln. Das Passwort
-            lässt sich später nicht mehr anzeigen — auch nicht von dir. Es
-            liegt bei Supabase nur als nicht umkehrbarer Hash.
+            Bitte jetzt notieren und dem Betrieb übermitteln. Das Passwort lässt
+            sich später nicht mehr anzeigen — auch nicht von dir. Es liegt bei
+            Supabase nur als nicht umkehrbarer Hash.
           </p>
         </div>
 

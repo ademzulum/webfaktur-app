@@ -172,7 +172,10 @@ export function Kopfleiste({
             : "pointer-events-none -translate-y-3 opacity-0",
         )}
       >
-        <nav className="flex flex-col px-4 pt-4 sm:px-6">
+        {/* Keine Trennstriche zwischen den Punkten: Der Abstand allein
+            reicht, um sie auseinanderzuhalten, und ohne Linien wirkt die
+            Liste ruhiger. */}
+        <nav className="flex flex-col px-4 pt-6 sm:px-6">
           {punkte.map((punkt, i) => (
             <Link
               key={punkt.pfad}
@@ -183,7 +186,7 @@ export function Kopfleiste({
               // Beim Schließen ohne Versatz, damit es zügig verschwindet.
               style={{ transitionDelay: offen ? `${80 + i * 60}ms` : "0ms" }}
               className={cn(
-                "flex items-center gap-3 border-b border-border/60 py-5 text-2xl transition-[opacity,transform] duration-[420ms] ease-[var(--ease-weich)]",
+                "-mx-2 flex items-center gap-3 rounded-lg px-2 py-4 text-2xl transition-[opacity,transform] duration-[420ms] ease-[var(--ease-weich)]",
                 offen ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0",
                 istAktiv(punkt.pfad)
                   ? "text-foreground"
