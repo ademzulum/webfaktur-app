@@ -107,7 +107,18 @@ export default async function BetriebeUebersicht() {
                   <TableCell className="text-right tabular-nums">
                     {centAlsEuro(betrieb.wert_gross_cent)}
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-right whitespace-nowrap">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      render={
+                        <Link
+                          href={`/dashboard/betriebe/${betrieb.id}/zugaenge`}
+                        />
+                      }
+                    >
+                      Zugänge
+                    </Button>
                     <Button
                       variant="ghost"
                       size="sm"
