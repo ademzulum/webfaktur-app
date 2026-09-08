@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 
 import { holeAngemeldetenNutzer } from "@/lib/nutzer";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 
 export type ZugangZustand = {
   fehler?: string;
@@ -45,6 +46,27 @@ export async function betriebsnutzerAnlegen(
     return { fehler: "Bitte eine gültige E-Mail-Adresse angeben." };
   }
 
+  // Sicherheitsnetz: Der Betrieb muss existieren, sonst entstünde ein Konto
+  // ohne Zuordnung - und das sähe später aus wie ein Fehler in den Regeln.
+  //
+  // Bewusst über die GEWOEHNLICHE Verbindung: Der Admin darf betriebe ohnehin
+  // lesen, dafür braucht es den geheimen Schlüssel nicht. Je weniger über ihn
+  // läuft, desto kleiner der Schaden, falls er je abhandenkommt.
+  const supabase = await createClient();
+  const { data: betrieb, error: lesefehler } = await supabase
+    .from("betriebe")
+    .select("id")
+    .eq("id", betriebId)
+    .maybeSingle();
+
+  // Die Fehlermeldung MUSS durchgereicht werden. Sie hier zu verschlucken und
+  // pauschal "nicht gefunden" zu melden, hat schon einmal eine halbe Stunde
+  // Suche gekostet - der Betrieb existierte, nur der Zugriff scheiterte.
+  if (lesefehler) {
+    return { fehler: `Betrieb konnte nicht geprüft werden: ${lesefehler.message}` };
+  }
+  if (!betrieb) return { fehler: "Betrieb nicht gefunden." };
+
   let admin: ReturnType<typeof createAdminClient>;
   try {
     admin = createAdminClient();
@@ -53,16 +75,6 @@ export async function betriebsnutzerAnlegen(
       fehler: fehler instanceof Error ? fehler.message : "Unbekannter Fehler",
     };
   }
-
-  // Sicherheitsnetz: Der Betrieb muss existieren, sonst entstünde ein Konto
-  // ohne Zuordnung - und das sähe später aus wie ein Fehler in den Regeln.
-  const { data: betrieb } = await admin
-    .from("betriebe")
-    .select("id")
-    .eq("id", betriebId)
-    .maybeSingle();
-
-  if (!betrieb) return { fehler: "Betrieb nicht gefunden." };
 
   const passwort = passwortErzeugen();
 
