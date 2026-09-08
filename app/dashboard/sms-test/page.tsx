@@ -9,6 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { holeAngemeldetenNutzer } from "@/lib/nutzer";
+import { einzelwert } from "@/lib/postgrest";
 import { createClient } from "@/lib/supabase/server";
 
 import { bewertungssmsSenden } from "./actions";
@@ -22,18 +23,8 @@ type Anrufzeile = {
   anrufer_nummer: string | null;
   matelso_id: string;
   betriebe: { name: string } | null;
-  // Auf bewertungen.anruf_id liegt ein "unique": pro Anruf hoechstens eine
-  // Bewertung. PostgREST erkennt das und liefert deshalb ein einzelnes
-  // Objekt oder null - KEIN Array. Beide Formen werden hier abgefangen,
-  // damit ein spaeterer Schemawechsel die Seite nicht umwirft.
   bewertungen: { id: string } | { id: string }[] | null;
 };
-
-function istBewertet(bewertungen: Anrufzeile["bewertungen"]): boolean {
-  if (bewertungen === null) return false;
-  if (Array.isArray(bewertungen)) return bewertungen.length > 0;
-  return true;
-}
 
 export default async function SmsTest() {
   const nutzer = await holeAngemeldetenNutzer();
@@ -117,7 +108,7 @@ export default async function SmsTest() {
                     <SmsKnopf
                       aktion={bewertungssmsSenden.bind(null, anruf.id)}
                       deaktiviert={
-                        istBewertet(anruf.bewertungen)
+                        einzelwert(anruf.bewertungen) !== null
                           ? "bereits bewertet"
                           : undefined
                       }
