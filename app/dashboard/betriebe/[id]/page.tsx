@@ -1,4 +1,4 @@
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
@@ -55,15 +55,21 @@ export default async function BetriebBearbeiten({
         <ChevronLeft className="size-4" />
         Alle Betriebe
       </Link>
-      <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+      {/* Untereinander, nicht nebeneinander.
+          Vorher standen beide in einer Zeile mit Abstand dazwischen - bei
+          einem kurzen Firmennamen rutschte der Verweis dadurch an den
+          rechten Rand und stand weit weg von dem, worauf er sich bezieht.
+          Wo er landet, hing also von der Länge des Namens ab. */}
+      <div className="mb-8 space-y-2">
         <h1 className="text-3xl font-semibold tracking-tight">
           {betrieb.name}
         </h1>
         <Link
           href={`/dashboard/betriebe/${betrieb.id}/zugaenge`}
-          className="text-sm text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
+          className="weich inline-flex items-center gap-1 text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground"
         >
           Zugänge verwalten
+          <ChevronRight className="size-4" />
         </Link>
       </div>
       <BetriebFormular
