@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useRef } from "react";
 
+import { bewegeMarkierung, MARKIERUNG_UEBERGANG } from "@/lib/markierung";
+
 export type Kategorie = {
   wert: string;
   titel: string;
@@ -49,19 +51,7 @@ export function Kategoriewahl({
    * würde jede Mausbewegung die ganze Reihe neu zeichnen lassen.
    */
   function bewegeZu(ziel: HTMLElement | null) {
-    const markierung = markierungRef.current;
-    const reihe = reiheRef.current;
-    if (!markierung || !reihe || !ziel) return;
-
-    const rahmen = reihe.getBoundingClientRect();
-    const feld = ziel.getBoundingClientRect();
-
-    markierung.style.width = `${feld.width}px`;
-    // Der Rollstand zählt mit: Auf schmalen Bildschirmen lässt sich die
-    // Reihe seitlich schieben, und dann stimmt die reine Bildschirmposition
-    // nicht mehr mit der Position innerhalb der Reihe überein.
-    markierung.style.transform = `translateX(${feld.left - rahmen.left + reihe.scrollLeft}px)`;
-    markierung.style.opacity = "1";
+    bewegeMarkierung(markierungRef.current, reiheRef.current, ziel);
   }
 
   return (
@@ -77,11 +67,8 @@ export function Kategoriewahl({
       <span
         ref={markierungRef}
         aria-hidden
-        className="pointer-events-none absolute top-1/2 left-0 h-9 -translate-y-1/2 rounded-full bg-muted opacity-0"
-        style={{
-          transition:
-            "transform 380ms var(--ease-federnd), width 560ms var(--ease-federnd), opacity 200ms linear",
-        }}
+        className="pointer-events-none absolute top-0 left-0 rounded-full bg-muted opacity-0"
+        style={{ transition: MARKIERUNG_UEBERGANG }}
       />
 
       {optionen.map((option) => {

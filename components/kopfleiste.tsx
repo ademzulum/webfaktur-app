@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useRef, useState } from "react";
 
 import { Wortmarke } from "@/components/marke/wortmarke";
+import { bewegeMarkierung, MARKIERUNG_UEBERGANG } from "@/lib/markierung";
 import { ThemeUmschalter } from "@/components/theme-umschalter";
 import { Button } from "@/components/ui/button";
 import { cn } from "cn";
@@ -47,16 +48,7 @@ export function Kopfleiste({
    * würde jede Mausbewegung die ganze Leiste neu zeichnen lassen.
    */
   function bewegeZu(ziel: HTMLElement | null) {
-    const markierung = markierungRef.current;
-    const nav = navRef.current;
-    if (!markierung || !nav || !ziel) return;
-
-    const rahmen = nav.getBoundingClientRect();
-    const feld = ziel.getBoundingClientRect();
-
-    markierung.style.width = `${feld.width}px`;
-    markierung.style.transform = `translateX(${feld.left - rahmen.left}px)`;
-    markierung.style.opacity = "1";
+    bewegeMarkierung(markierungRef.current, navRef.current, ziel);
   }
 
   return (
@@ -91,11 +83,8 @@ export function Kopfleiste({
             <span
               ref={markierungRef}
               aria-hidden
-              className="pointer-events-none absolute top-1/2 left-0 h-11 -translate-y-1/2 rounded-full bg-muted opacity-0"
-              style={{
-                transition:
-                  "transform 380ms var(--ease-federnd), width 560ms var(--ease-federnd), opacity 200ms linear",
-              }}
+              className="pointer-events-none absolute top-0 left-0 rounded-full bg-muted opacity-0"
+              style={{ transition: MARKIERUNG_UEBERGANG }}
             />
 
             {punkte.map((punkt) => (

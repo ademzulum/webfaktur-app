@@ -2,6 +2,8 @@
 
 import { useRef } from "react";
 
+import { bewegeMarkierung, MARKIERUNG_UEBERGANG } from "@/lib/markierung";
+
 /**
  * Eine Reihe von Auswahlmöglichkeiten, von denen genau eine gilt.
  *
@@ -35,37 +37,26 @@ export function Auswahlreihe({
    * Schiebt die Markierung unter das übergebene Element.
    *
    * Bewusst über die DOM-Eigenschaften statt über React-Zustand: Sonst
-   * würde jeder Tastendruck und jede Mausbewegung die ganze Reihe neu
-   * zeichnen lassen.
+   * würde jeder Tastendruck die ganze Reihe neu zeichnen lassen.
    */
   function bewegeZu(ziel: HTMLElement | null) {
-    const markierung = markierungRef.current;
-    const reihe = reiheRef.current;
-    if (!markierung || !reihe || !ziel) return;
-
-    const rahmen = reihe.getBoundingClientRect();
-    const feld = ziel.getBoundingClientRect();
-
-    markierung.style.width = `${feld.width}px`;
-    markierung.style.height = `${feld.height}px`;
-    markierung.style.transform = `translateX(${feld.left - rahmen.left}px)`;
-    markierung.style.opacity = "1";
+    bewegeMarkierung(markierungRef.current, reiheRef.current, ziel);
   }
 
   return (
     <div
       ref={reiheRef}
       onMouseLeave={() => bewegeZu(aktivRef.current)}
-      className="relative inline-flex flex-wrap gap-1 rounded-xl border bg-muted/40 p-1"
+      className="relative inline-flex flex-wrap gap-1 rounded-full border bg-muted/40 p-1"
     >
+      {/* Vollrund wie im Kopfmenü und bei den Kategorien. Alle gleitenden
+          Markierungen der Anwendung haben dieselbe Form - eine mit anderem
+          Eckenradius wirkte wie ein anderes Bedienelement. */}
       <span
         ref={markierungRef}
         aria-hidden
-        className="pointer-events-none absolute top-1 left-1 rounded-lg bg-card opacity-0 shadow-sm"
-        style={{
-          transition:
-            "transform 380ms var(--ease-federnd), width 560ms var(--ease-federnd), opacity 200ms linear",
-        }}
+        className="pointer-events-none absolute top-0 left-0 rounded-full bg-card opacity-0 shadow-sm"
+        style={{ transition: MARKIERUNG_UEBERGANG }}
       />
 
       {optionen.map((option) => (
@@ -102,7 +93,7 @@ export function Auswahlreihe({
 
               return () => window.removeEventListener("resize", nachmessen);
             }}
-            className="weich block cursor-pointer rounded-lg px-4 py-2 text-sm text-muted-foreground peer-checked:text-foreground peer-focus-visible:ring-3 peer-focus-visible:ring-ring/50 hover:text-foreground"
+            className="weich block cursor-pointer rounded-full px-4 py-2 text-sm text-muted-foreground peer-checked:text-foreground peer-focus-visible:ring-3 peer-focus-visible:ring-ring/50 hover:text-foreground"
           >
             {option.titel}
           </span>
