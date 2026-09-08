@@ -1,7 +1,8 @@
-import type { Metadata, Viewport } from "next";
+import type { Metadata } from "next";
 import { DM_Mono, Newsreader } from "next/font/google";
 
 import { Hintergrunddienst } from "@/components/hintergrunddienst";
+import { LEISTENFARBE, THEME_SPEICHER } from "@/lib/theme";
 
 import "./globals.css";
 
@@ -37,33 +38,39 @@ export const metadata: Metadata = {
 };
 
 /**
- * Die Farbe der Systemleiste, wenn Webfaktur vom Startbildschirm gestartet
- * wird. Bewusst der dunkle Hintergrund: Dunkel ist die Voreinstellung, und
- * die Leiste soll nahtlos in die Seite übergehen.
- */
-export const viewport: Viewport = {
-  themeColor: "#0a0a0b",
-};
-
-/**
  * Läuft, bevor die Seite gezeichnet wird.
  *
  * Ohne das würde beim Laden kurz die helle Ansicht aufblitzen, bevor React
  * übernimmt - besonders unangenehm, weil dunkel die Voreinstellung ist.
  * Deshalb bewusst ein einfaches Skript im Kopfbereich und nicht React.
+ *
+ * Es setzt AUCH die Farbe der Systemleiste. Bewusst hier und nicht über die
+ * Metadaten von Next.js: Von dort käme ein fester Wert, der sich beim
+ * Umschalten nicht mitändert. Und wären es zwei Angaben - eine feste und
+ * eine gesetzte -, nähme der Browser die erste, was nur am Telefon
+ * auffiele.
  */
 const themeSkript = `
 (function () {
+  var dunkel = true;
   try {
-    var gewaehlt = localStorage.getItem("webfaktur-theme");
-    if (gewaehlt === "hell") {
-      document.documentElement.classList.remove("dark");
-    } else {
-      document.documentElement.classList.add("dark");
-    }
+    dunkel = localStorage.getItem(${JSON.stringify(THEME_SPEICHER)}) !== "hell";
   } catch (e) {
-    document.documentElement.classList.add("dark");
+    // Manche Browser sperren den Speicher. Dann gilt die Voreinstellung.
   }
+
+  document.documentElement.classList.toggle("dark", dunkel);
+
+  var angabe = document.querySelector('meta[name="theme-color"]');
+  if (!angabe) {
+    angabe = document.createElement("meta");
+    angabe.setAttribute("name", "theme-color");
+    document.head.appendChild(angabe);
+  }
+  angabe.setAttribute(
+    "content",
+    dunkel ? ${JSON.stringify(LEISTENFARBE.dunkel)} : ${JSON.stringify(LEISTENFARBE.hell)}
+  );
 })();
 `;
 

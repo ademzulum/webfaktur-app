@@ -1,8 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-
-const SPEICHER = "webfaktur-theme";
+import { setzeLeistenfarbe, THEME_SPEICHER } from "@/lib/theme";
 
 /**
  * Umschalter zwischen dunkler und heller Ansicht.
@@ -18,8 +17,13 @@ const SPEICHER = "webfaktur-theme";
 export function ThemeUmschalter() {
   function umschalten() {
     const dunkelJetzt = document.documentElement.classList.toggle("dark");
+
+    // Muss mitwandern, sonst bleibt die Leiste am oberen Rand des Telefons
+    // in der Farbe stehen, die beim Öffnen der Seite galt.
+    setzeLeistenfarbe(dunkelJetzt);
+
     try {
-      localStorage.setItem(SPEICHER, dunkelJetzt ? "dunkel" : "hell");
+      localStorage.setItem(THEME_SPEICHER, dunkelJetzt ? "dunkel" : "hell");
     } catch {
       // Manche Browser sperren den Speicher. Dann gilt die Wahl eben nur für
       // diesen Besuch - kein Grund, hier abzubrechen.
