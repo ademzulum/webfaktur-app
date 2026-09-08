@@ -22,8 +22,18 @@ type Anrufzeile = {
   anrufer_nummer: string | null;
   matelso_id: string;
   betriebe: { name: string } | null;
-  bewertungen: { id: string }[];
+  // Auf bewertungen.anruf_id liegt ein "unique": pro Anruf hoechstens eine
+  // Bewertung. PostgREST erkennt das und liefert deshalb ein einzelnes
+  // Objekt oder null - KEIN Array. Beide Formen werden hier abgefangen,
+  // damit ein spaeterer Schemawechsel die Seite nicht umwirft.
+  bewertungen: { id: string } | { id: string }[] | null;
 };
+
+function istBewertet(bewertungen: Anrufzeile["bewertungen"]): boolean {
+  if (bewertungen === null) return false;
+  if (Array.isArray(bewertungen)) return bewertungen.length > 0;
+  return true;
+}
 
 export default async function SmsTest() {
   const nutzer = await holeAngemeldetenNutzer();
@@ -96,7 +106,7 @@ export default async function SmsTest() {
                     <SmsKnopf
                       aktion={bewertungssmsSenden.bind(null, anruf.id)}
                       deaktiviert={
-                        anruf.bewertungen.length > 0
+                        istBewertet(anruf.bewertungen)
                           ? "bereits bewertet"
                           : undefined
                       }
