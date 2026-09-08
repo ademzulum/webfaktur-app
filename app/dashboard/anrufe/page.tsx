@@ -1,11 +1,11 @@
 import { redirect } from "next/navigation";
 
+import { Kennzahlreihe } from "@/components/kennzahl";
+import { Filterreihe } from "@/components/ui/filterreihe";
 import { centAlsEuro } from "@/lib/geld";
 import { holeAngemeldetenNutzer } from "@/lib/nutzer";
 import { einzelwert } from "@/lib/postgrest";
 import { createClient } from "@/lib/supabase/server";
-
-import { Kennzahlkachel } from "@/components/kennzahl";
 
 import { AnrufKarte, type Anrufdaten } from "./anruf-karte";
 import { KampagnenBalken, type Kampagnenwert } from "./kampagnen-balken";
@@ -14,6 +14,11 @@ export const dynamic = "force-dynamic";
 
 /** Wie viele Anrufe in die Auswertung einfließen. */
 const GRENZE = 200;
+
+/** Wie viele Karten höchstens gezeigt werden. */
+const KARTEN = 50;
+
+const PFAD = "/dashboard/anrufe";
 
 type Bewertung = {
   ergebnis: "kein_auftrag" | "klein" | "mittel" | "gross";
@@ -31,9 +36,42 @@ type Anruf = {
   bewertungen: Bewertung | Bewertung[] | null;
 };
 
-export default async function Anrufauswertung() {
+type Zustand = "alle" | "offen" | "auftrag" | "kein";
+type Sortierung = "neu" | "wert" | "alt";
+
+/**
+ * Holt einen Wert aus der Adresse und lässt nur Erlaubtes durch.
+ *
+ * Wichtig: Was in der Adresse steht, kommt von außen und kann alles
+ * enthalten. Deshalb wird nicht darauf vertraut, sondern gegen eine feste
+ * Liste geprüft. Passt nichts, gilt die Voreinstellung.
+ */
+function nurErlaubt<T extends string>(
+  roh: string | string[] | undefined,
+  erlaubt: readonly T[],
+  voreinstellung: T,
+): T {
+  const wert = Array.isArray(roh) ? roh[0] : roh;
+  return erlaubt.includes(wert as T) ? (wert as T) : voreinstellung;
+}
+
+export default async function Anrufauswertung({
+  searchParams,
+}: PageProps<"/dashboard/anrufe">) {
   const nutzer = await holeAngemeldetenNutzer();
   if (!nutzer) redirect("/login");
+
+  const felder = await searchParams;
+  const zustand = nurErlaubt<Zustand>(
+    felder.zustand,
+    ["alle", "offen", "auftrag", "kein"],
+    "alle",
+  );
+  const sortierung = nurErlaubt<Sortierung>(
+    felder.sortierung,
+    ["neu", "wert", "alt"],
+    "neu",
+  );
 
   const supabase = await createClient();
 
@@ -56,6 +94,8 @@ export default async function Anrufauswertung() {
   const auftraege = bewertet.filter(
     (a) => bewertungVon(a)!.ergebnis !== "kein_auftrag",
   );
+  const ohneAuftrag = bewertet.length - auftraege.length;
+  const offen = anrufe.length - bewertet.length;
   const wertSumme = bewertet.reduce(
     (summe, a) => summe + bewertungVon(a)!.wert_cent,
     0,
@@ -65,6 +105,8 @@ export default async function Anrufauswertung() {
     ganzes === 0 ? "—" : `${Math.round((teil / ganzes) * 100)} %`;
 
   // Auftragswert je Kampagne, absteigend, höchstens acht Balken.
+  // Bewusst über ALLE Anrufe, nicht über die gefilterten: Die Auswertung
+  // soll sich nicht mitverschieben, wenn man unten die Liste einschränkt.
   const jeKampagne = new Map<string, { cent: number; anrufe: number }>();
   for (const a of bewertet) {
     const name = a.kampagne?.trim() || "ohne Kampagne";
@@ -80,6 +122,28 @@ export default async function Anrufauswertung() {
     .filter((k) => k.cent > 0)
     .sort((a, b) => b.cent - a.cent)
     .slice(0, 8);
+
+  // --- Liste filtern und sortieren -------------------------------------
+  const passt = (a: Anruf) => {
+    const b = bewertungVon(a);
+    if (zustand === "offen") return b === null;
+    if (zustand === "auftrag")
+      return b !== null && b.ergebnis !== "kein_auftrag";
+    if (zustand === "kein") return b !== null && b.ergebnis === "kein_auftrag";
+    return true;
+  };
+
+  const wertVon = (a: Anruf) => bewertungVon(a)?.wert_cent ?? -1;
+
+  const gefiltert = anrufe.filter(passt);
+  const sortiert = [...gefiltert].sort((a, b) => {
+    if (sortierung === "wert") return wertVon(b) - wertVon(a);
+    const zeitA = new Date(a.beginn).getTime();
+    const zeitB = new Date(b.beginn).getTime();
+    return sortierung === "alt" ? zeitA - zeitB : zeitB - zeitA;
+  });
+
+  const sichtbar = sortiert.slice(0, KARTEN);
 
   return (
     <main className="auftauchen mx-auto w-full max-w-5xl flex-1 px-4 py-12 sm:px-6 sm:py-16">
@@ -98,17 +162,17 @@ export default async function Anrufauswertung() {
           Konnte nicht geladen werden: {error.message}
         </p>
       ) : anrufe.length === 0 ? (
-        <div className="rounded-lg border bg-card p-8 text-center">
+        <div className="rounded-xl border border-dashed bg-card/50 p-12 text-center">
           <p className="font-medium">Noch keine Anrufe vorhanden.</p>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
             Mit supabase/testdaten-anrufe.sql lässt sich ein Satz Testanrufe
             anlegen, um die Auswertung zu sehen.
           </p>
         </div>
       ) : (
         <div className="space-y-10">
-          <section className="auftauchen-gestaffelt grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {[
+          <Kennzahlreihe
+            kacheln={[
               { titel: "Anrufe", wert: String(anrufe.length) },
               {
                 titel: "Bewertet",
@@ -121,63 +185,98 @@ export default async function Anrufauswertung() {
                 zusatz: `${anteil(auftraege.length, bewertet.length)} der Bewertungen`,
               },
               { titel: "Auftragswert", wert: centAlsEuro(wertSumme) },
-            ].map((kachel, i) => (
-              <div
-                key={kachel.titel}
-                style={{ "--verzoegerung": i } as React.CSSProperties}
-              >
-                <Kennzahlkachel {...kachel} />
-              </div>
-            ))}
-          </section>
+            ]}
+          />
 
           {kampagnendaten.length > 0 ? (
             <section className="rounded-xl border bg-card p-5 text-card-foreground sm:p-6">
-              <h2 className="font-mono text-xs tracking-wide text-muted-foreground uppercase">
+              <h2 className="text-xs tracking-wide text-muted-foreground uppercase">
                 Auftragswert je Kampagne
               </h2>
               <p className="mt-1 mb-6 text-xs text-muted-foreground">
-                Summe der bewerteten Aufträge. Der längste Balken ist die
-                stärkste Kampagne, alle anderen richten sich danach.
+                Die volle Breite ist der gesamte Auftragswert. Jeder Balken
+                zeigt, welchen Anteil daran eine Kampagne hat.
               </p>
               <KampagnenBalken daten={kampagnendaten} />
             </section>
           ) : null}
 
           <section>
-            <h2 className="mb-4 font-mono text-xs tracking-wide text-muted-foreground uppercase">
-              Letzte Anrufe
-            </h2>
-            <div className="auftauchen-gestaffelt grid gap-3">
-              {anrufe.slice(0, 50).map((anruf, i) => {
-                const bewertung = bewertungVon(anruf);
-                const betrieb = einzelwert(anruf.betriebe);
-                const daten: Anrufdaten = {
-                  id: anruf.id,
-                  beginn: anruf.beginn,
-                  anrufer_nummer: anruf.anrufer_nummer,
-                  dauer_sekunden: anruf.dauer_sekunden,
-                  kampagne: anruf.kampagne,
-                  keyword: anruf.keyword,
-                  betrieb:
-                    nutzer.rolle === "admin" ? (betrieb?.name ?? null) : null,
-                  ergebnis: bewertung?.ergebnis ?? null,
-                  wert_cent: bewertung?.wert_cent ?? null,
-                };
-                return (
-                  <div
-                    key={anruf.id}
-                    style={
-                      {
-                        "--verzoegerung": Math.min(i, 12),
-                      } as React.CSSProperties
-                    }
-                  >
-                    <AnrufKarte anruf={daten} />
-                  </div>
-                );
-              })}
+            <div className="mb-5 flex flex-wrap items-center gap-3">
+              <Filterreihe
+                pfad={PFAD}
+                parameter="zustand"
+                aktuell={zustand}
+                weitere={{ sortierung }}
+                beschriftung="Anrufe einschränken"
+                optionen={[
+                  { wert: "alle", titel: "Alle", anzahl: anrufe.length },
+                  { wert: "offen", titel: "Offen", anzahl: offen },
+                  {
+                    wert: "auftrag",
+                    titel: "Aufträge",
+                    anzahl: auftraege.length,
+                  },
+                  { wert: "kein", titel: "Kein Auftrag", anzahl: ohneAuftrag },
+                ]}
+              />
+
+              <Filterreihe
+                pfad={PFAD}
+                parameter="sortierung"
+                aktuell={sortierung}
+                weitere={{ zustand }}
+                beschriftung="Reihenfolge"
+                optionen={[
+                  { wert: "neu", titel: "Neueste" },
+                  { wert: "alt", titel: "Älteste" },
+                  { wert: "wert", titel: "Höchster Wert" },
+                ]}
+              />
             </div>
+
+            {sichtbar.length === 0 ? (
+              <p className="rounded-xl border border-dashed bg-card/50 px-5 py-10 text-center text-sm text-muted-foreground">
+                Kein Anruf in dieser Auswahl.
+              </p>
+            ) : (
+              <div className="auftauchen-gestaffelt grid gap-3">
+                {sichtbar.map((anruf, i) => {
+                  const bewertung = bewertungVon(anruf);
+                  const betrieb = einzelwert(anruf.betriebe);
+                  const daten: Anrufdaten = {
+                    id: anruf.id,
+                    beginn: anruf.beginn,
+                    anrufer_nummer: anruf.anrufer_nummer,
+                    dauer_sekunden: anruf.dauer_sekunden,
+                    kampagne: anruf.kampagne,
+                    keyword: anruf.keyword,
+                    betrieb:
+                      nutzer.rolle === "admin" ? (betrieb?.name ?? null) : null,
+                    ergebnis: bewertung?.ergebnis ?? null,
+                    wert_cent: bewertung?.wert_cent ?? null,
+                  };
+                  return (
+                    <div
+                      key={anruf.id}
+                      style={
+                        {
+                          "--verzoegerung": Math.min(i, 12),
+                        } as React.CSSProperties
+                      }
+                    >
+                      <AnrufKarte anruf={daten} />
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {sortiert.length > KARTEN ? (
+              <p className="mt-4 text-center text-xs text-muted-foreground">
+                {sichtbar.length} von {sortiert.length} Anrufen gezeigt.
+              </p>
+            ) : null}
           </section>
         </div>
       )}

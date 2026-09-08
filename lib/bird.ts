@@ -1,6 +1,5 @@
 export type SmsErgebnis =
-  | { ok: true; id: string }
-  | { ok: false; grund: string };
+  { ok: true; id: string } | { ok: false; grund: string };
 
 /**
  * Die Region steckt im Schlüssel selbst: bk_eu1_... oder bk_us1_...
@@ -22,7 +21,10 @@ function regionAusSchluessel(schluessel: string): string | null {
  * nirgends protokolliert. Ohne NEXT_PUBLIC_ davor bleibt er auf dem Server
  * und gelangt nie in den Browser.
  */
-export async function smsSenden(an: string, text: string): Promise<SmsErgebnis> {
+export async function smsSenden(
+  an: string,
+  text: string,
+): Promise<SmsErgebnis> {
   const schluessel = process.env.BIRD_API_KEY;
   const absender = process.env.BIRD_ABSENDER;
 

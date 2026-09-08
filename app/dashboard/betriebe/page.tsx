@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { centAlsEuro } from "@/lib/geld";
+import { paketTitel } from "@/lib/paket";
 import { holeAngemeldetenNutzer } from "@/lib/nutzer";
 import { createClient } from "@/lib/supabase/server";
 
@@ -93,7 +94,7 @@ export default async function BetriebeUebersicht() {
                     {betrieb.name}
                   </h2>
                   <p className="mt-1 font-mono text-xs text-muted-foreground">
-                    {betrieb.paket}
+                    {paketTitel(betrieb.paket)}
                     {betrieb.telefon ? <> &middot; {betrieb.telefon}</> : null}
                   </p>
                 </div>

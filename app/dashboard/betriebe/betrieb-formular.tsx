@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Schalter } from "@/components/ui/schalter";
+import { paketTitel } from "@/lib/paket";
 
 import type { FormularZustand } from "./actions";
 
@@ -61,6 +62,33 @@ function Abschnitt({
       ) : null}
       <div className="mt-5">{children}</div>
     </section>
+  );
+}
+
+/**
+ * Ein beschriftetes Feld, das sich in ein zweizeiliges Raster einfügt.
+ *
+ * "grid-rows-subgrid" heißt: Diese Spalte legt keine eigenen Zeilen an,
+ * sondern benutzt die des übergeordneten Rasters. Dadurch liegen alle
+ * Beschriftungen in derselben Zeile und alle Felder in derselben darunter -
+ * unabhängig davon, ob eine Beschriftung einzeilig oder zweizeilig ist.
+ */
+function Feld({
+  id,
+  titel,
+  children,
+}: {
+  id: string;
+  titel: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="grid gap-2 sm:row-span-2 sm:grid-rows-subgrid">
+      <Label htmlFor={id} className="self-end">
+        {titel}
+      </Label>
+      {children}
+    </div>
   );
 }
 
@@ -121,7 +149,7 @@ export function BetriebFormular({
   const aktuellesPaket = betrieb?.paket ?? "basis";
   const pakete = PAKETE.some((p) => p.wert === aktuellesPaket)
     ? PAKETE
-    : [...PAKETE, { wert: aktuellesPaket, titel: aktuellesPaket }];
+    : [...PAKETE, { wert: aktuellesPaket, titel: paketTitel(aktuellesPaket) }];
 
   return (
     <form action={absenden} className="space-y-4">
@@ -139,11 +167,13 @@ export function BetriebFormular({
             />
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="telefon">
-                Mobilnummer für die Bewertungs-SMS
-              </Label>
+          {/* Zwei Spalten, deren Beschriftungen und Felder jeweils auf
+              einer Höhe sitzen - auch wenn eine Beschriftung umbricht und
+              die andere nicht. Das erledigt "subgrid": Beide Spalten
+              benutzen dieselben zwei Zeilen des äußeren Rasters, statt
+              jede für sich zu wachsen. */}
+          <div className="grid gap-4 sm:grid-cols-2 sm:grid-rows-[auto_auto]">
+            <Feld id="telefon" titel="Mobilnummer für die Bewertungs-SMS">
               <Input
                 id="telefon"
                 name="telefon"
@@ -152,12 +182,9 @@ export function BetriebFormular({
                 placeholder="+43 664 1234567"
                 className="h-11"
               />
-            </div>
+            </Feld>
 
-            <div className="space-y-2">
-              <Label htmlFor="google_ads_kundennummer">
-                Google-Ads-Kundennummer
-              </Label>
+            <Feld id="google_ads_kundennummer" titel="Google-Ads-Kundennummer">
               <Input
                 id="google_ads_kundennummer"
                 name="google_ads_kundennummer"
@@ -165,7 +192,7 @@ export function BetriebFormular({
                 placeholder="123-456-7890"
                 className="h-11"
               />
-            </div>
+            </Feld>
           </div>
         </div>
       </Abschnitt>

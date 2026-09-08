@@ -7,41 +7,33 @@ export type Kampagnenwert = {
 };
 
 /**
- * Auftragswert je Kampagne.
+ * Auftragswert je Kampagne, als Anteil am Gesamtwert.
  *
- * Bewusst KEINE Diagrammbibliothek mehr, sondern eine schlichte Liste aus
- * Balken. Die Gründe:
+ * WICHTIG - das war vorher falsch: Die Balken waren am größten Balken
+ * ausgerichtet. Die stärkste Kampagne füllte damit die volle Breite, obwohl
+ * daneben "46 %" stand. Balken und Zahl sagten also Unterschiedliches, und
+ * der Balken sagte das Falsche.
  *
- * 1. Die Zahl steht in derselben Zeile wie der Name, rechtsbündig - nicht
- *    neben dem Balkenende. Dadurch fluchten alle Beträge untereinander und
- *    lassen sich vergleichen, statt an wechselnden Stellen zu stehen.
- * 2. Alles Wichtige steht IM Bild, nichts versteckt sich in einem Feld,
- *    das erst beim Überfahren erscheint. Auf einem Telefon gibt es kein
- *    Überfahren - dort wären solche Angaben schlicht nicht erreichbar.
- * 3. Die Breite regelt der Browser. Es gibt keine feste Zeichenfläche, die
- *    auf kleinen Bildschirmen zu eng wird.
+ * Jetzt ist die volle Breite der gesamte Auftragswert. 46 Prozent füllen 46
+ * Prozent. Alle Balken zusammen ergeben genau die Breite einmal - man sieht
+ * damit unmittelbar, wie sich der Umsatz auf die Kampagnen verteilt.
  *
  * Bewusst nur EINE Farbe: Es wird eine einzige Größe gezeigt. Verschiedene
  * Farben je Balken würden eine Bedeutung vortäuschen, die die Daten nicht
  * haben.
  */
 export function KampagnenBalken({ daten }: { daten: Kampagnenwert[] }) {
-  // Der längste Balken füllt die Breite aus, alle anderen richten sich
-  // danach. So ist der Vergleich untereinander sofort ablesbar.
-  const groesster = Math.max(...daten.map((d) => d.cent), 1);
   const gesamt = daten.reduce((summe, d) => summe + d.cent, 0);
 
   return (
     <ul className="space-y-5">
       {daten.map((eintrag, i) => {
-        const breite = Math.max(2, (eintrag.cent / groesster) * 100);
-        const anteil =
-          gesamt === 0 ? 0 : Math.round((eintrag.cent / gesamt) * 100);
+        const anteil = gesamt === 0 ? 0 : (eintrag.cent / gesamt) * 100;
 
         return (
           <li
             key={eintrag.name}
-            // Die ganze Zeile reagiert, nicht nur der Balken. Ein 14 Pixel
+            // Die ganze Zeile reagiert, nicht nur der Balken. Ein 16 Pixel
             // hoher Balken ist ein schlechtes Ziel für die Maus - die Zeile
             // ist zwanzigmal so groß.
             className="weich group -mx-2 rounded-lg px-2 py-2 hover:bg-muted/40"
@@ -64,16 +56,16 @@ export function KampagnenBalken({ daten }: { daten: Kampagnenwert[] }) {
                   className="balken weich h-full rounded-full bg-primary group-hover:brightness-110"
                   style={
                     {
-                      width: `${breite}%`,
+                      // Mindestens ein schmaler Rest, damit auch eine winzige
+                      // Kampagne noch sichtbar ist statt ganz zu verschwinden.
+                      width: `${Math.max(1.5, anteil)}%`,
                       "--verzoegerung": i,
                     } as React.CSSProperties
                   }
                 />
               </div>
-              {/* Am Telefon zu wenig Platz - dort entfällt der Anteil, der
-                  Betrag daneben sagt ohnehin dasselbe genauer. */}
-              <span className="hidden w-10 shrink-0 text-right text-xs tabular-nums text-muted-foreground sm:block">
-                {anteil} %
+              <span className="w-11 shrink-0 text-right text-xs tabular-nums text-muted-foreground">
+                {Math.round(anteil)} %
               </span>
             </div>
           </li>

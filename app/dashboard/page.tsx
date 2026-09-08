@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { Kennzahlkachel } from "@/components/kennzahl";
+import { Kennzahlreihe } from "@/components/kennzahl";
 import { centAlsEuro } from "@/lib/geld";
 import { holeAngemeldetenNutzer } from "@/lib/nutzer";
 import { einzelwert } from "@/lib/postgrest";
@@ -88,8 +88,8 @@ export default async function Dashboard() {
         </p>
       </header>
 
-      <section className="auftauchen-gestaffelt grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {[
+      <Kennzahlreihe
+        kacheln={[
           {
             titel: "Anrufe",
             wert: String(anrufe),
@@ -100,14 +100,14 @@ export default async function Dashboard() {
             titel: "Offen",
             wert: String(offen),
             zusatz: offen === 0 ? "alles bewertet" : "warten auf Bewertung",
-            pfad: "/dashboard/anrufe",
+            pfad: "/dashboard/anrufe?zustand=offen",
             hervorgehoben: offen > 0,
           },
           {
             titel: "Aufträge",
             wert: String(auftraege),
             zusatz: `Bewertungsquote ${quote}`,
-            pfad: "/dashboard/anrufe",
+            pfad: "/dashboard/anrufe?zustand=auftrag",
           },
           {
             titel: "Auftragswert",
@@ -116,17 +116,10 @@ export default async function Dashboard() {
               nutzer.rolle === "admin"
                 ? `über ${betriebe} ${betriebe === 1 ? "Betrieb" : "Betriebe"}`
                 : "aus allen Bewertungen",
-            pfad: "/dashboard/anrufe",
+            pfad: "/dashboard/anrufe?zustand=auftrag",
           },
-        ].map((kachel, i) => (
-          <div
-            key={kachel.titel}
-            style={{ "--verzoegerung": i } as React.CSSProperties}
-          >
-            <Kennzahlkachel {...kachel} />
-          </div>
-        ))}
-      </section>
+        ]}
+      />
 
       {letzteAnrufe.length > 0 ? (
         <section className="mt-12">
