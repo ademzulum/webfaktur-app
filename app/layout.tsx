@@ -12,7 +12,10 @@ const newsreader = Newsreader({
 const dmMono = DM_Mono({
   variable: "--font-dm-mono",
   subsets: ["latin"],
-  weight: ["300", "400", "500"],
+  // Nur die zwei Strichstaerken, die tatsaechlich vorkommen. Jede weitere
+  // waere eine zusaetzliche Datei, die der Besucher herunterlaedt, ohne dass
+  // sie je zu sehen ist.
+  weight: ["400", "500"],
   display: "swap",
 });
 

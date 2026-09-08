@@ -16,6 +16,14 @@ type Bewertung = {
   wert_cent: number;
 };
 
+type Kennzahlen = {
+  anrufe: number;
+  bewertungen: number;
+  auftraege: number;
+  wert_summe: number;
+  betriebe: number;
+};
+
 type Anruf = {
   id: string;
   beginn: string;
@@ -33,39 +41,37 @@ export default async function Dashboard() {
 
   const supabase = await createClient();
 
-  // Nur Zählungen, keine Zeilen. "head: true" holt ausschließlich die Anzahl.
-  // Welche Zeilen mitgezählt werden, entscheiden weiterhin die Zugriffsregeln.
-  const [anrufeZahl, bewertungenZahl, betriebeZahl, werte, letzte] =
-    await Promise.all([
-      supabase.from("anrufe").select("*", { count: "exact", head: true }),
-      supabase.from("bewertungen").select("*", { count: "exact", head: true }),
-      supabase.from("betriebe").select("*", { count: "exact", head: true }),
-      supabase.from("bewertungen").select("wert_cent, ergebnis"),
-      supabase
-        .from("anrufe")
-        .select(
-          "id, beginn, anrufer_nummer, dauer_sekunden, kampagne, keyword, betriebe(name), bewertungen(ergebnis, wert_cent)",
-        )
-        .order("beginn", { ascending: false })
-        .limit(4),
-    ]);
+  // Eine Abfrage für alle Zahlen, statt fünf.
+  //
+  // Wichtiger als die Geschwindigkeit ist die Richtigkeit: Vorher wurden
+  // alle Bewertungen geladen und hier zusammengezählt. Supabase liefert aber
+  // höchstens 1000 Zeilen je Abfrage - ohne Fehlermeldung. Ab der 1001.
+  // Bewertung wäre die Summe stillschweigend zu klein gewesen.
+  //
+  // Welche Zeilen mitgezählt werden, entscheiden weiterhin die Zugriffsregeln
+  // der Datenbank: Die Funktion läuft mit den Rechten des Aufrufers.
+  const [zahlen, letzte] = await Promise.all([
+    supabase.rpc("kennzahlen").maybeSingle(),
+    supabase
+      .from("anrufe")
+      .select(
+        "id, beginn, anrufer_nummer, dauer_sekunden, kampagne, keyword, betriebe(name), bewertungen(ergebnis, wert_cent)",
+      )
+      .order("beginn", { ascending: false })
+      .limit(4),
+  ]);
 
-  const anrufe = anrufeZahl.count ?? 0;
-  const bewertungen = bewertungenZahl.count ?? 0;
-  const betriebe = betriebeZahl.count ?? 0;
+  const kennzahlen = (zahlen.data ?? null) as Kennzahlen | null;
+
+  const anrufe = kennzahlen?.anrufe ?? 0;
+  const bewertungen = kennzahlen?.bewertungen ?? 0;
+  const auftraege = kennzahlen?.auftraege ?? 0;
+  const summe = kennzahlen?.wert_summe ?? 0;
+  const betriebe = kennzahlen?.betriebe ?? 0;
 
   // Pro Anruf gibt es höchstens eine Bewertung, deshalb ist die Differenz
   // genau die Zahl der noch offenen.
   const offen = Math.max(0, anrufe - bewertungen);
-
-  const bewertungsliste = (werte.data ?? []) as {
-    wert_cent: number;
-    ergebnis: string;
-  }[];
-  const summe = bewertungsliste.reduce((s, z) => s + z.wert_cent, 0);
-  const auftraege = bewertungsliste.filter(
-    (z) => z.ergebnis !== "kein_auftrag",
-  ).length;
 
   const letzteAnrufe = (letzte.data ?? []) as unknown as Anruf[];
 
@@ -87,6 +93,19 @@ export default async function Dashboard() {
             : "Ausschließlich die Daten deines Betriebs."}
         </p>
       </header>
+
+      {/* Solange 0008_kennzahlen.sql nicht ausgeführt ist, gibt es die
+          Funktion in der Datenbank nicht. Ohne diesen Hinweis stünden
+          überall Nullen - und Nullen sehen aus wie "noch keine Daten",
+          nicht wie ein Fehler. */}
+      {zahlen.error ? (
+        <p
+          role="alert"
+          className="mb-6 rounded-xl border border-destructive/40 bg-destructive/10 p-4 text-sm font-medium text-destructive"
+        >
+          Die Kennzahlen konnten nicht geladen werden: {zahlen.error.message}
+        </p>
+      ) : null}
 
       <Kennzahlreihe
         kacheln={[

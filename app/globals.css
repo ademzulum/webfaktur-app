@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
 /* Dunkel gilt für alles innerhalb eines Elements mit der Klasse "dark".
@@ -71,7 +70,6 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
 
-  --animate-auftauchen: auftauchen 0.4s ease-out both;
 }
 
 /* ==========================================================================

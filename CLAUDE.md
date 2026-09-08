@@ -24,7 +24,7 @@ Umsatz statt auf Klicks optimiert.
 ## Stack
 Next.js (App Router, TypeScript), Tailwind, shadcn/ui, Recharts
 Supabase (Postgres, Auth, Row Level Security), Region Frankfurt
-Vercel Hosting, Twilio SMS
+Vercel Hosting
 
 ## Nutzerrollen
 - Admin (Agenturinhaber): sieht alle Betriebe, weist Pakete zu
