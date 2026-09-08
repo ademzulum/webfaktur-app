@@ -49,9 +49,12 @@ export default async function Dashboard() {
       </dl>
 
       {nutzer?.rolle === "admin" ? (
-        <div>
+        <div className="flex flex-wrap gap-3">
           <Button render={<Link href="/dashboard/betriebe" />}>
             Betriebe verwalten
+          </Button>
+          <Button variant="outline" render={<Link href="/dashboard/sms-test" />}>
+            SMS-Versand testen
           </Button>
         </div>
       ) : null}
