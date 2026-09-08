@@ -48,5 +48,10 @@ Ein Schritt pro Aufgabe, keine ungefragten Zusatzfunktionen.
 Jede angelegte Datei kurz erklären.
 Nach jedem funktionierenden Schritt committen.
 
+## Kosten pro Ereignis
+- SMS (bird): 0,09 € pro Nachricht
+- Eine Bewertungs-SMS pro qualifiziertem Anruf
+- Bei der Preiskalkulation und im Admin-Dashboard (Kostenübersicht pro Betrieb) berücksichtigen
+
 <!-- Bindet die Next.js-16-Hinweise aus AGENTS.md ein (von "next dev" gepflegt). -->
 @AGENTS.md
