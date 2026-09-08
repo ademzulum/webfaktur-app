@@ -1,6 +1,7 @@
 import { CheckCircle2, Clock, XCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { centAlsEuro } from "@/lib/geld";
 import { createClient } from "@/lib/supabase/server";
 import { tokenHash } from "@/lib/token";
@@ -48,8 +49,10 @@ function Hinweis({
 
 export default async function Bewertungsseite({
   params,
+  searchParams,
 }: PageProps<"/bewerten/[token]">) {
   const { token } = await params;
+  const { fehler } = await searchParams;
 
   const supabase = await createClient();
   const { data } = await supabase.rpc("bewertung_daten", {
@@ -145,25 +148,103 @@ export default async function Bewertungsseite({
         </div>
       </header>
 
-      <div className="space-y-3">
-        {stufen.map((stufe) => (
-          <form key={stufe.wert} action={bewertungAbgeben}>
+      {fehler === "betrag" ? (
+        <p
+          role="alert"
+          className="auftauchen mb-4 rounded-xl border border-destructive/40 bg-destructive/10 p-4 text-sm font-medium text-destructive"
+        >
+          Der Betrag wurde nicht verstanden. Bitte nur Ziffern eingeben, zum
+          Beispiel 40.000 oder 40000.
+        </p>
+      ) : null}
+
+      {/* Die Schaltflächen kommen nacheinander herein, wie die Karten im
+          Dashboard. Der Versatz steckt in --verzoegerung. */}
+      <div className="auftauchen-gestaffelt space-y-3">
+        {stufen.map((stufe, i) => (
+          <form
+            key={stufe.wert}
+            action={bewertungAbgeben}
+            style={{ "--verzoegerung": i } as React.CSSProperties}
+          >
             <input type="hidden" name="token" value={token} />
             <input type="hidden" name="ergebnis" value={stufe.wert} />
             <Button
               type="submit"
               variant={stufe.wert === "kein_auftrag" ? "outline" : "default"}
-              className="h-16 w-full justify-between px-5 text-base transition-transform duration-150 active:scale-[0.98]"
+              className="h-16 w-full justify-between px-5 text-base hover:-translate-y-1"
             >
               <span>{stufe.beschriftung}</span>
               {stufe.betrag !== null ? (
-                <span className="font-mono text-sm tabular-nums opacity-80">
+                <span className="text-sm tabular-nums opacity-80">
                   ca. {centAlsEuro(stufe.betrag)}
                 </span>
               ) : null}
             </Button>
           </form>
         ))}
+
+        {/* Fünfter Punkt: eigener Betrag.
+            Bewusst ein aufklappbarer Bereich statt einer fünften
+            Schaltfläche - er ist der Ausnahmefall und soll die vier
+            Antworten, die zwei Taps brauchen, nicht verdrängen.
+
+            Bewusst mit <details>: Das klappt der Browser von sich aus auf.
+            Es braucht kein Programm im Browser, und es funktioniert auch,
+            wenn eines nicht lädt - was auf einer Baustelle mit schlechtem
+            Empfang durchaus vorkommt. */}
+        <details
+          // Bewusst OHNE das Anheben der anderen Kaesten: Ist der Bereich
+          // aufgeklappt, steckt ein Formular darin - eine Flaeche, die
+          // sich beim Tippen unter dem Finger hebt, waere irritierend.
+          className="weich group overflow-hidden rounded-lg border bg-card hover:border-primary/40 open:border-primary/40"
+          style={{ "--verzoegerung": stufen.length } as React.CSSProperties}
+          open={fehler === "betrag"}
+        >
+          <summary className="weich flex h-16 cursor-pointer list-none items-center justify-between px-5 text-base hover:bg-muted/40">
+            <span>Anderer Betrag</span>
+            <span className="weich text-sm text-muted-foreground group-open:rotate-45">
+              +
+            </span>
+          </summary>
+
+          <form
+            action={bewertungAbgeben}
+            className="space-y-3 border-t border-border p-5"
+          >
+            <input type="hidden" name="token" value={token} />
+            <input type="hidden" name="ergebnis" value="eigen" />
+
+            <label htmlFor="wert" className="block text-sm">
+              Was war der Auftrag ungefähr wert?
+            </label>
+
+            <div className="relative">
+              <Input
+                id="wert"
+                name="wert"
+                inputMode="decimal"
+                // "decimal" blendet am Telefon die Zifferntastatur ein.
+                // Ein Textfeld würde die Schreibtastatur zeigen, und der
+                // Betrieb müsste erst umschalten.
+                placeholder="40.000"
+                autoComplete="off"
+                className="h-14 pr-10 text-right text-lg tabular-nums"
+                required
+              />
+              <span
+                aria-hidden
+                className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-muted-foreground"
+              >
+                €
+              </span>
+            </div>
+
+            <Button type="submit" className="h-14 w-full text-base">
+              Betrag übernehmen
+            </Button>
+          </form>
+        </details>
       </div>
 
       <p className="mt-8 text-center text-xs text-muted-foreground">

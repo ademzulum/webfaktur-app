@@ -12,7 +12,7 @@ import { AnrufKarte, type Anrufdaten } from "./anrufe/anruf-karte";
 export const dynamic = "force-dynamic";
 
 type Bewertung = {
-  ergebnis: "kein_auftrag" | "klein" | "mittel" | "gross";
+  ergebnis: "kein_auftrag" | "klein" | "mittel" | "gross" | "eigen";
   wert_cent: number;
 };
 

@@ -8,7 +8,7 @@ export type Anrufdaten = {
   kampagne: string | null;
   keyword: string | null;
   betrieb: string | null;
-  ergebnis: "kein_auftrag" | "klein" | "mittel" | "gross" | null;
+  ergebnis: "kein_auftrag" | "klein" | "mittel" | "gross" | "eigen" | null;
   wert_cent: number | null;
 };
 
@@ -20,6 +20,8 @@ const BESCHRIFTUNG: Record<
   klein: { text: "Kleiner Auftrag", auftrag: true },
   mittel: { text: "Mittlerer Auftrag", auftrag: true },
   gross: { text: "Großer Auftrag", auftrag: true },
+  // Der Betrieb hat den Betrag selbst eingetippt statt eine Stufe zu wählen.
+  eigen: { text: "Auftrag, eigener Betrag", auftrag: true },
 };
 
 function dauerLesbar(sekunden: number | null): string {

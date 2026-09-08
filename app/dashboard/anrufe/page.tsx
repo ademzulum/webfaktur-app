@@ -22,7 +22,7 @@ const KARTEN = 50;
 const PFAD = "/dashboard/anrufe";
 
 type Bewertung = {
-  ergebnis: "kein_auftrag" | "klein" | "mittel" | "gross";
+  ergebnis: "kein_auftrag" | "klein" | "mittel" | "gross" | "eigen";
   wert_cent: number;
 };
 
