@@ -28,10 +28,7 @@ export default async function DashboardLayout({
   ];
 
   if (nutzer.rolle === "admin") {
-    punkte.push(
-      { titel: "Betriebe", pfad: "/dashboard/betriebe" },
-      { titel: "SMS-Test", pfad: "/dashboard/sms-test" },
-    );
+    punkte.push({ titel: "Betriebe", pfad: "/dashboard/betriebe" });
   }
 
   return (

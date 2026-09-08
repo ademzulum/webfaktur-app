@@ -177,8 +177,8 @@ export default async function Anrufauswertung({
         <div className="rounded-xl border border-dashed bg-card/50 p-12 text-center">
           <p className="font-medium">Noch keine Anrufe vorhanden.</p>
           <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
-            Mit supabase/testdaten-anrufe.sql lässt sich ein Satz Testanrufe
-            anlegen, um die Auswertung zu sehen.
+            Sobald matelso angebunden ist, erscheinen eingehende Anrufe hier
+            innerhalb von Sekunden.
           </p>
         </div>
       ) : (
@@ -286,7 +286,6 @@ export default async function Anrufauswertung({
                   const bewertung = bewertungVon(anruf);
                   const betrieb = einzelwert(anruf.betriebe);
                   const daten: Anrufdaten = {
-                    id: anruf.id,
                     beginn: anruf.beginn,
                     anrufer_nummer: anruf.anrufer_nummer,
                     dauer_sekunden: anruf.dauer_sekunden,

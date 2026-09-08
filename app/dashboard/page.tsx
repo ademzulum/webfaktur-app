@@ -159,7 +159,6 @@ export default async function Dashboard() {
               const bewertung = einzelwert(anruf.bewertungen);
               const betrieb = einzelwert(anruf.betriebe);
               const daten: Anrufdaten = {
-                id: anruf.id,
                 beginn: anruf.beginn,
                 anrufer_nummer: anruf.anrufer_nummer,
                 dauer_sekunden: anruf.dauer_sekunden,

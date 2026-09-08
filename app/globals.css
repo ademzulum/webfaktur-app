@@ -331,12 +331,6 @@
   .ohne-rollleiste::-webkit-scrollbar {
     display: none;
   }
-
-  .federnd {
-    transition-property: transform, width, opacity;
-    transition-duration: 420ms;
-    transition-timing-function: var(--ease-federnd);
-  }
 }
 
 /* ==========================================================================

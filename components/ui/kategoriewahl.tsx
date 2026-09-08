@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 
 import { bewegeMarkierung, MARKIERUNG_UEBERGANG } from "@/lib/markierung";
 
-export type Kategorie = {
+type Kategorie = {
   wert: string;
   titel: string;
   anzahl?: number;

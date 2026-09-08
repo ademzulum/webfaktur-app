@@ -1,7 +1,6 @@
 import { centAlsEuro } from "@/lib/geld";
 
 export type Anrufdaten = {
-  id: string;
   beginn: string;
   anrufer_nummer: string | null;
   dauer_sekunden: number | null;

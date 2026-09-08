@@ -16,15 +16,15 @@ Umsatz statt auf Klicks optimiert.
 ## Kernablauf
 1. matelso schickt nach Gesprächsende einen Webhook an /api/webhooks/matelso
 2. Anruf wird in Supabase gespeichert
-3. Zwei Minuten später SMS an den Betrieb (Twilio) mit signiertem Einmal-Link
+3. Zwei Minuten später SMS an den Betrieb (Bird) mit signiertem Einmal-Link
 4. Bewertungsseite ohne Login, Token 48 Stunden gültig, vier Schaltflächen
 5. Bewertung geht als Call Conversion an Google (Data Manager API)
 6. Dashboard (PWA mit Login) zeigt Anrufe, Auswertungen, ROAS
 
 ## Stack
-Next.js (App Router, TypeScript), Tailwind, shadcn/ui, Recharts
+Next.js (App Router, TypeScript), Tailwind, shadcn/ui
 Supabase (Postgres, Auth, Row Level Security), Region Frankfurt
-Vercel Hosting
+Vercel Hosting (Region Frankfurt), Bird SMS
 
 ## Nutzerrollen
 - Admin (Agenturinhaber): sieht alle Betriebe, weist Pakete zu
@@ -38,7 +38,7 @@ Jede Zeile in anrufe und bewertungen gehört genau einem Betrieb.
 - Mandantentrennung über Row Level Security in der Datenbank,
   nicht über Anwendungslogik
 - Keine Schlüssel im Code, ausschließlich Umgebungsvariablen
-- Twilio über API Key (SK…), nicht über den Auth Token
+- Bird über einen Zugangsschlüssel (bk_eu1_…) aus einer Umgebungsvariablen
 - Personenbezogene Daten (Anrufernummern, Standorte) bleiben in der EU
 - Authentifizierung über Supabase Auth, nichts selbst gebaut
 
