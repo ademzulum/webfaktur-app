@@ -19,11 +19,19 @@ export function bewegeMarkierung(
   markierung: HTMLElement | null,
   behaelter: HTMLElement | null,
   ziel: HTMLElement | null,
+  /** Beim allerersten Setzen: springen statt gleiten. */
+  sofort = false,
 ): void {
   if (!markierung || !behaelter || !ziel) return;
 
   const aussen = behaelter.getBoundingClientRect();
   const feld = ziel.getBoundingClientRect();
+
+  // Ist das Ziel gerade gar nicht sichtbar - etwa das Kopfmenü am Telefon,
+  // das erst ab Tablet erscheint - hat es keine Ausdehnung. Dann wäre jede
+  // Rechnung sinnlos, und die Markierung würde als Strich der Breite null
+  // sichtbar geschaltet. Also nichts tun und auf den nächsten Anlass warten.
+  if (feld.width === 0 || feld.height === 0) return;
   const stil = getComputedStyle(behaelter);
 
   const versatzLinks =
@@ -37,12 +45,24 @@ export function bewegeMarkierung(
   const x = feld.left - aussen.left - versatzLinks + behaelter.scrollLeft;
   const y = feld.top - aussen.top - versatzOben + behaelter.scrollTop;
 
+  // Beim ersten Setzen ohne Übergang: Sonst würde die Markierung sichtbar
+  // aus der linken oberen Ecke herangeglitten kommen, weil sie dort startet.
+  if (sofort) markierung.style.transition = "none";
+
   // Höhe wird mitgesetzt, damit die Markierung nicht von Hand zentriert
   // werden muss. Sie ist einfach so hoch wie das, worunter sie liegt.
   markierung.style.width = `${feld.width}px`;
   markierung.style.height = `${feld.height}px`;
   markierung.style.transform = `translate(${x}px, ${y}px)`;
   markierung.style.opacity = "1";
+
+  if (sofort) {
+    // Zwingt den Browser, die neue Stelle sofort zu übernehmen, bevor der
+    // Übergang wieder eingeschaltet wird. Ohne diese Zeile würde er beides
+    // zusammenfassen und doch gleiten.
+    void markierung.offsetWidth;
+    markierung.style.transition = MARKIERUNG_UEBERGANG;
+  }
 }
 
 /**

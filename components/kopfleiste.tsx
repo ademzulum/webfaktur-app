@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Wortmarke } from "@/components/marke/wortmarke";
 import { bewegeMarkierung, MARKIERUNG_UEBERGANG } from "@/lib/markierung";
@@ -51,6 +51,31 @@ export function Kopfleiste({
     bewegeMarkierung(markierungRef.current, navRef.current, ziel);
   }
 
+  /**
+   * Setzt die Markierung auf den aktuellen Punkt - nach dem Einbau.
+   *
+   * React hängt die Verweise von innen nach außen ein: Die Menüpunkte
+   * bekommen ihren VOR der Leiste, die sie umgibt. Würde hier während des
+   * Einbaus gerechnet, fehlte der Bezugspunkt.
+   */
+  useEffect(() => {
+    const nav = navRef.current;
+    if (!nav) return;
+
+    const setzen = (sofort = false) => {
+      aktivRef.current = nav.querySelector<HTMLElement>("[aria-current]");
+      bewegeMarkierung(markierungRef.current, nav, aktivRef.current, sofort);
+    };
+
+    setzen(true);
+
+    const nachmessen = () => setzen();
+    window.addEventListener("resize", nachmessen);
+    document.fonts?.ready.then(nachmessen);
+
+    return () => window.removeEventListener("resize", nachmessen);
+  }, [pfad]);
+
   return (
     <>
       {/* Kopfleiste und Vollbildmenü sind BEWUSST Geschwister und nicht
@@ -91,20 +116,6 @@ export function Kopfleiste({
               <Link
                 key={punkt.pfad}
                 href={punkt.pfad}
-                ref={(el) => {
-                  if (!istAktiv(punkt.pfad)) return;
-                  aktivRef.current = el;
-                  bewegeZu(el);
-
-                  // Beim Laden sind die Schriften oft noch nicht da, die Punkte
-                  // werden danach breiter. Und bei Größenänderung des
-                  // Fensters stimmt die Position ebenfalls nicht mehr.
-                  const nachmessen = () => bewegeZu(aktivRef.current);
-                  window.addEventListener("resize", nachmessen);
-                  document.fonts?.ready.then(nachmessen);
-
-                  return () => window.removeEventListener("resize", nachmessen);
-                }}
                 onMouseEnter={(e) => bewegeZu(e.currentTarget)}
                 onFocus={(e) => bewegeZu(e.currentTarget)}
                 aria-current={istAktiv(punkt.pfad) ? "page" : undefined}

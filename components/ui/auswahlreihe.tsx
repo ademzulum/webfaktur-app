@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import { bewegeMarkierung, MARKIERUNG_UEBERGANG } from "@/lib/markierung";
 
@@ -29,15 +29,39 @@ export function Auswahlreihe({
   const aktivRef = useRef<HTMLElement | null>(null);
 
   /**
-   * Schiebt die Markierung unter das übergebene Element.
+   * Setzt die Markierung an ihren Platz - nach dem Einbau, nicht währenddessen.
    *
-   * Bewusst über die DOM-Eigenschaften statt über React-Zustand: Sonst
-   * würde jeder Tastendruck die ganze Reihe neu zeichnen lassen.
+   * WARUM HIER UND NICHT BEIM EINHÄNGEN DER ELEMENTE:
+   * React hängt die Verweise von innen nach außen ein. Die Beschriftungen
+   * bekommen ihren Verweis also VOR dem Kasten, der sie umgibt. Wurde die
+   * Position dort berechnet, gab es den Kasten noch gar nicht - und ohne
+   * Bezugspunkt blieb die Markierung in der linken oberen Ecke liegen.
+   *
+   * Das hier läuft, wenn alles steht. Damit kann es nicht mehr schiefgehen.
    */
-  function bewegeZu(ziel: HTMLElement | null) {
-    if (ziel) aktivRef.current = ziel;
-    bewegeMarkierung(markierungRef.current, reiheRef.current, ziel);
-  }
+  useEffect(() => {
+    const reihe = reiheRef.current;
+    if (!reihe) return;
+
+    const setzen = (sofort = false) => {
+      aktivRef.current = reihe.querySelector<HTMLElement>(
+        `[data-feld="${gewaehlt}"]`,
+      );
+      bewegeMarkierung(markierungRef.current, reihe, aktivRef.current, sofort);
+    };
+
+    setzen(true);
+
+    // Beim Laden sind die Schriften oft noch nicht da, die Wörter werden
+    // danach breiter. Und bei Größenänderung des Fensters stimmt die
+    // Position ebenfalls nicht mehr.
+    const nachmessen = () =>
+      bewegeMarkierung(markierungRef.current, reihe, aktivRef.current);
+    window.addEventListener("resize", nachmessen);
+    document.fonts?.ready.then(nachmessen);
+
+    return () => window.removeEventListener("resize", nachmessen);
+  }, [gewaehlt]);
 
   return (
     <div
@@ -52,11 +76,9 @@ export function Auswahlreihe({
       />
 
       {optionen.map((option) => (
-        // "inline-flex" ist hier nicht Geschmack, sondern nötig: Ohne das
-        // wäre die Beschriftung ein Fließtext-Element, und ein solches hat
-        // keine verlässlichen Maße. Genau daran ist die Markierung vorher
-        // vorbeigerutscht - sie hat den Umriss des Textflusses gemessen
-        // statt den des sichtbaren Feldes.
+        // "inline-flex" ist nicht Geschmack, sondern nötig: Ohne das wäre die
+        // Beschriftung ein Element des Textflusses, und ein solches hat keine
+        // verlässlichen Maße.
         <label key={option.wert} className="relative z-10 inline-flex">
           <input
             type="radio"
@@ -66,28 +88,19 @@ export function Auswahlreihe({
             // Beim Umschalten wandert die Markierung zur neuen Wahl.
             // Gemessen wird die Beschriftung daneben, nicht das Auswahlfeld
             // selbst - das ist unsichtbar und hat keine Ausdehnung.
-            onChange={(e) =>
-              bewegeZu(e.currentTarget.nextElementSibling as HTMLElement)
-            }
+            onChange={(e) => {
+              aktivRef.current = e.currentTarget
+                .nextElementSibling as HTMLElement;
+              bewegeMarkierung(
+                markierungRef.current,
+                reiheRef.current,
+                aktivRef.current,
+              );
+            }}
             className="peer sr-only"
           />
           <span
-            ref={(el) => {
-              if (option.wert !== gewaehlt) return;
-
-              // Beim ersten Zeichnen die Startposition setzen. Wurde
-              // inzwischen etwas anderes gewählt, bleibt diese Wahl stehen.
-              bewegeZu(aktivRef.current ?? el);
-
-              // Beim Laden sind die Schriften oft noch nicht da, die Wörter
-              // werden danach breiter. Und bei Größenänderung des Fensters
-              // stimmt die Position ebenfalls nicht mehr.
-              const nachmessen = () => bewegeZu(aktivRef.current);
-              window.addEventListener("resize", nachmessen);
-              document.fonts?.ready.then(nachmessen);
-
-              return () => window.removeEventListener("resize", nachmessen);
-            }}
+            data-feld={option.wert}
             className="weich block cursor-pointer rounded-lg px-4 py-2 text-sm text-muted-foreground peer-checked:text-foreground peer-focus-visible:ring-3 peer-focus-visible:ring-ring/50 hover:text-foreground"
           >
             {option.titel}

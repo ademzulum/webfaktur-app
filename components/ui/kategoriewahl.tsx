@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import { bewegeMarkierung, MARKIERUNG_UEBERGANG } from "@/lib/markierung";
 
@@ -54,6 +54,31 @@ export function Kategoriewahl({
     bewegeMarkierung(markierungRef.current, reiheRef.current, ziel);
   }
 
+  /**
+   * Setzt die Markierung auf die aktuelle Kategorie - nach dem Einbau.
+   *
+   * React hängt die Verweise von innen nach außen ein: Die Kategorien
+   * bekommen ihren VOR der Reihe, die sie umgibt. Würde hier während des
+   * Einbaus gerechnet, fehlte der Bezugspunkt.
+   */
+  useEffect(() => {
+    const reihe = reiheRef.current;
+    if (!reihe) return;
+
+    const setzen = (sofort = false) => {
+      aktivRef.current = reihe.querySelector<HTMLElement>("[aria-current]");
+      bewegeMarkierung(markierungRef.current, reihe, aktivRef.current, sofort);
+    };
+
+    setzen(true);
+
+    const nachmessen = () => setzen();
+    window.addEventListener("resize", nachmessen);
+    document.fonts?.ready.then(nachmessen);
+
+    return () => window.removeEventListener("resize", nachmessen);
+  }, [aktuell]);
+
   return (
     <div
       ref={reiheRef}
@@ -87,20 +112,6 @@ export function Kategoriewahl({
             // Anfang - richtig, wenn man wirklich woandershin geht, falsch
             // beim Filtern.
             scroll={false}
-            ref={(el) => {
-              if (!gewaehlt) return;
-              aktivRef.current = el;
-              bewegeZu(el);
-
-              // Beim Laden sind die Schriften oft noch nicht da, die Wörter
-              // werden danach breiter. Und bei Größenänderung des Fensters
-              // stimmt die Position ebenfalls nicht mehr.
-              const nachmessen = () => bewegeZu(aktivRef.current);
-              window.addEventListener("resize", nachmessen);
-              document.fonts?.ready.then(nachmessen);
-
-              return () => window.removeEventListener("resize", nachmessen);
-            }}
             onMouseEnter={(e) => bewegeZu(e.currentTarget)}
             onFocus={(e) => bewegeZu(e.currentTarget)}
             aria-current={gewaehlt ? "true" : undefined}
