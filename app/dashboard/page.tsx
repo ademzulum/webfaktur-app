@@ -73,7 +73,7 @@ export default async function Dashboard() {
     anrufe === 0 ? "—" : `${Math.round((bewertungen / anrufe) * 100)} %`;
 
   return (
-    <main className="auftauchen mx-auto w-full max-w-5xl flex-1 px-4 py-12 sm:px-6 sm:py-16">
+    <main className="auftauchen mx-auto w-full max-w-5xl flex-1 px-5 py-10 sm:px-6 sm:py-16">
       <header className="mb-10 space-y-3 sm:mb-12">
         <p className="font-mono text-xs tracking-wide text-muted-foreground uppercase">
           {nutzer.rolle === "admin" ? "Agenturinhaber" : "Betrieb"}
@@ -122,7 +122,7 @@ export default async function Dashboard() {
       />
 
       {letzteAnrufe.length > 0 ? (
-        <section className="mt-12">
+        <section className="mt-14">
           <div className="mb-4 flex items-baseline justify-between gap-4">
             <h2 className="font-mono text-xs tracking-wide text-muted-foreground uppercase">
               Zuletzt eingegangen
@@ -135,7 +135,7 @@ export default async function Dashboard() {
             </Link>
           </div>
 
-          <div className="auftauchen-gestaffelt grid gap-3">
+          <div className="auftauchen-gestaffelt grid gap-4">
             {letzteAnrufe.map((anruf, i) => {
               const bewertung = einzelwert(anruf.bewertungen);
               const betrieb = einzelwert(anruf.betriebe);

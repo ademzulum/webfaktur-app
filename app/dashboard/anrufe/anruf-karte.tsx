@@ -93,7 +93,7 @@ export function AnrufKarte({ anruf }: { anruf: Anrufdaten }) {
   });
 
   return (
-    <article className="karte rounded-xl border bg-card p-4 hover:border-primary/40 hover:bg-muted/20 sm:p-5">
+    <article className="karte rounded-xl border bg-card p-5 hover:border-primary/40 hover:bg-muted/20 sm:p-6">
       <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
         <Kennzeichen ergebnis={anruf.ergebnis} />
         <time dateTime={anruf.beginn} className="text-xs text-muted-foreground">

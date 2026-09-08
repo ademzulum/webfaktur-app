@@ -43,7 +43,7 @@ export default async function SmsTest() {
   const anrufe = (data ?? []) as unknown as Anrufzeile[];
 
   return (
-    <main className="auftauchen mx-auto w-full max-w-4xl flex-1 px-4 py-12 sm:px-6 sm:py-16">
+    <main className="auftauchen mx-auto w-full max-w-4xl flex-1 px-5 py-10 sm:px-6 sm:py-16">
       <header className="mb-8 space-y-2">
         <h1 className="text-3xl font-semibold tracking-tight">
           SMS-Versand testen

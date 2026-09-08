@@ -50,7 +50,7 @@ export default async function BetriebeUebersicht() {
   const betriebe = (data ?? []) as Zeile[];
 
   return (
-    <main className="auftauchen mx-auto w-full max-w-5xl flex-1 px-4 py-12 sm:px-6 sm:py-16">
+    <main className="auftauchen mx-auto w-full max-w-5xl flex-1 px-5 py-10 sm:px-6 sm:py-16">
       <header className="mb-10 flex flex-wrap items-end justify-between gap-4">
         <div className="space-y-2">
           <h1 className="text-3xl font-semibold tracking-tight">Betriebe</h1>

@@ -69,7 +69,7 @@ export function Kopfleiste({
           würde es sich an der Leiste ausrichten statt am Bildschirm - und
           wäre damit null Pixel hoch. */}
       <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-xl">
-        <div className="mx-auto flex h-20 w-full max-w-6xl items-center gap-6 px-4 sm:h-24 sm:gap-10 sm:px-6">
+        <div className="mx-auto flex h-20 w-full max-w-6xl items-center gap-6 px-5 sm:h-24 sm:gap-10 sm:px-6">
           <Link
             href="/dashboard"
             onClick={() => setzeMenue(false)}
@@ -175,7 +175,7 @@ export function Kopfleiste({
         {/* Keine Trennstriche zwischen den Punkten: Der Abstand allein
             reicht, um sie auseinanderzuhalten, und ohne Linien wirkt die
             Liste ruhiger. */}
-        <nav className="flex flex-col px-4 pt-6 sm:px-6">
+        <nav className="flex flex-col px-5 pt-6 sm:px-6">
           {punkte.map((punkt, i) => (
             <Link
               key={punkt.pfad}
@@ -207,7 +207,7 @@ export function Kopfleiste({
 
         <form
           action={abmelden}
-          className="mt-auto px-4 pb-10 sm:px-6"
+          className="mt-auto px-5 pb-10 sm:px-6"
           style={{
             transitionDelay: offen ? `${80 + punkte.length * 60}ms` : "0ms",
           }}

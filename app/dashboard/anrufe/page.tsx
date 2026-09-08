@@ -102,16 +102,6 @@ export default async function Anrufauswertung({
     0,
   );
 
-  // Nur die tatsächlichen Aufträge, für den Durchschnitt weiter unten.
-  const auftragsSumme = auftraege.reduce(
-    (summe, a) => summe + bewertungVon(a)!.wert_cent,
-    0,
-  );
-  const schnitt =
-    auftraege.length === 0
-      ? null
-      : Math.round(auftragsSumme / auftraege.length);
-
   const anteil = (teil: number, ganzes: number) =>
     ganzes === 0 ? "—" : `${Math.round((teil / ganzes) * 100)} %`;
 
@@ -157,7 +147,7 @@ export default async function Anrufauswertung({
   const sichtbar = sortiert.slice(0, KARTEN);
 
   return (
-    <main className="auftauchen mx-auto w-full max-w-5xl flex-1 px-4 py-12 sm:px-6 sm:py-16">
+    <main className="auftauchen mx-auto w-full max-w-5xl flex-1 px-5 py-10 sm:px-6 sm:py-16">
       <header className="mb-8 space-y-2">
         <h1 className="text-3xl font-semibold tracking-tight">Anrufe</h1>
         <p className="text-sm text-muted-foreground">
@@ -181,7 +171,7 @@ export default async function Anrufauswertung({
           </p>
         </div>
       ) : (
-        <div className="space-y-10">
+        <div className="space-y-12 sm:space-y-14">
           <Kennzahlreihe
             kacheln={[
               {
@@ -202,10 +192,17 @@ export default async function Anrufauswertung({
               {
                 titel: "Auftragswert",
                 wert: centAlsEuro(wertSumme),
+                // BEWUSST NICHT der Durchschnitt je Auftrag. Der würde aus
+                // den Wertstufen berechnet, die der Betrieb selbst
+                // eingestellt hat - jeder große Auftrag ist bei ihm exakt
+                // derselbe Betrag. Der Durchschnitt saehe nach Messung aus,
+                // waere aber nur eine Mischung aus drei selbst gesetzten
+                // Zahlen, noch dazu groschengenau. Die Anzahl dagegen
+                // stimmt.
                 zusatz:
-                  schnitt === null
+                  auftraege.length === 0
                     ? "noch kein Auftrag"
-                    : `${centAlsEuro(schnitt)} je Auftrag`,
+                    : `aus ${auftraege.length} ${auftraege.length === 1 ? "Auftrag" : "Aufträgen"}`,
               },
             ]}
           />
@@ -272,7 +269,7 @@ export default async function Anrufauswertung({
             ) : (
               <div
                 key={`${zustand}-${sortierung}`}
-                className="auftauchen-gestaffelt grid gap-3"
+                className="auftauchen-gestaffelt grid gap-4"
               >
                 {sichtbar.map((anruf, i) => {
                   const bewertung = bewertungVon(anruf);
