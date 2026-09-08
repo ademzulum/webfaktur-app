@@ -46,11 +46,15 @@ export function Filterreihe({
             key={option.wert}
             href={`${pfad}?${felder.toString()}`}
             aria-current={gewaehlt ? "true" : undefined}
+            // Die Umschaltung läuft über einen Seitenwechsel. React
+            // behält dabei diese Verweise und tauscht nur ihre Klassen aus -
+            // deshalb greift der Übergang und die Auswahl gleitet
+            // hinüber, statt umzuspringen.
             className={
               "weich rounded-lg px-3 py-2 text-sm " +
               (gewaehlt
-                ? "bg-card text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground")
+                ? "scale-[1.02] bg-card text-foreground shadow-sm"
+                : "text-muted-foreground hover:bg-card/50 hover:text-foreground")
             }
           >
             {option.titel}

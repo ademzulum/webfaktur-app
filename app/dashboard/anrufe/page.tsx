@@ -101,6 +101,16 @@ export default async function Anrufauswertung({
     0,
   );
 
+  // Nur die tatsächlichen Aufträge, für den Durchschnitt weiter unten.
+  const auftragsSumme = auftraege.reduce(
+    (summe, a) => summe + bewertungVon(a)!.wert_cent,
+    0,
+  );
+  const schnitt =
+    auftraege.length === 0
+      ? null
+      : Math.round(auftragsSumme / auftraege.length);
+
   const anteil = (teil: number, ganzes: number) =>
     ganzes === 0 ? "—" : `${Math.round((teil / ganzes) * 100)} %`;
 
@@ -173,7 +183,11 @@ export default async function Anrufauswertung({
         <div className="space-y-10">
           <Kennzahlreihe
             kacheln={[
-              { titel: "Anrufe", wert: String(anrufe.length) },
+              {
+                titel: "Anrufe",
+                wert: String(anrufe.length),
+                zusatz: offen === 0 ? "alle bewertet" : `${offen} noch offen`,
+              },
               {
                 titel: "Bewertet",
                 wert: String(bewertet.length),
@@ -184,7 +198,14 @@ export default async function Anrufauswertung({
                 wert: String(auftraege.length),
                 zusatz: `${anteil(auftraege.length, bewertet.length)} der Bewertungen`,
               },
-              { titel: "Auftragswert", wert: centAlsEuro(wertSumme) },
+              {
+                titel: "Auftragswert",
+                wert: centAlsEuro(wertSumme),
+                zusatz:
+                  schnitt === null
+                    ? "noch kein Auftrag"
+                    : `${centAlsEuro(schnitt)} je Auftrag`,
+              },
             ]}
           />
 
@@ -235,12 +256,24 @@ export default async function Anrufauswertung({
               />
             </div>
 
+            {/* Der Schlüssel enthält die gewählte Auswahl.
+                Ändert sie sich, wirft React die alten Karten weg und baut
+                neue - dadurch läuft die Einblendung erneut. Ohne das würde
+                React dieselben Karten behalten und nur ihren Inhalt
+                austauschen: Die Liste würde schlagartig umspringen, ohne
+                jede Bewegung. */}
             {sichtbar.length === 0 ? (
-              <p className="rounded-xl border border-dashed bg-card/50 px-5 py-10 text-center text-sm text-muted-foreground">
+              <p
+                key={`leer-${zustand}`}
+                className="auftauchen rounded-xl border border-dashed bg-card/50 px-5 py-10 text-center text-sm text-muted-foreground"
+              >
                 Kein Anruf in dieser Auswahl.
               </p>
             ) : (
-              <div className="auftauchen-gestaffelt grid gap-3">
+              <div
+                key={`${zustand}-${sortierung}`}
+                className="auftauchen-gestaffelt grid gap-3"
+              >
                 {sichtbar.map((anruf, i) => {
                   const bewertung = bewertungVon(anruf);
                   const betrieb = einzelwert(anruf.betriebe);

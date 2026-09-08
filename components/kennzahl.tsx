@@ -39,6 +39,11 @@ export function Kennzahlreihe({ kacheln }: { kacheln: Kachel[] }) {
     Math.max(...kacheln.map((k) => k.wert.length), 1),
   );
 
+  // Hat auch nur eine Kachel eine Unterzeile, halten ALLE den Platz dafür
+  // frei. Sonst rutscht die Zahl in den Kacheln ohne Unterzeile nach unten,
+  // und die Reihe steht nicht mehr auf einer Linie.
+  const mitUnterzeile = kacheln.some((k) => k.zusatz);
+
   return (
     <section className="auftauchen-gestaffelt grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {kacheln.map((kachel, i) => (
@@ -46,7 +51,11 @@ export function Kennzahlreihe({ kacheln }: { kacheln: Kachel[] }) {
           key={kachel.titel}
           style={{ "--verzoegerung": i } as React.CSSProperties}
         >
-          <Kennzahlkachel kachel={kachel} groesse={groesse} />
+          <Kennzahlkachel
+            kachel={kachel}
+            groesse={groesse}
+            mitUnterzeile={mitUnterzeile}
+          />
         </div>
       ))}
     </section>
@@ -57,9 +66,11 @@ export function Kennzahlreihe({ kacheln }: { kacheln: Kachel[] }) {
 function Kennzahlkachel({
   kachel,
   groesse,
+  mitUnterzeile,
 }: {
   kachel: Kachel;
   groesse: string;
+  mitUnterzeile: boolean;
 }) {
   const inhalt = (
     <>
@@ -81,9 +92,12 @@ function Kennzahlkachel({
         >
           {kachel.wert}
         </p>
-        {kachel.zusatz ? (
+        {mitUnterzeile ? (
           <p className="mt-1.5 text-sm text-muted-foreground">
-            {kachel.zusatz}
+            {/* Fehlt der Text, bleibt die Zeile trotzdem stehen - sonst
+                wäre diese Kachel niedriger als ihre Nachbarn. Das
+                geschützte Leerzeichen hält die Zeilenhöhe. */}
+            {kachel.zusatz ?? "\u00A0"}
           </p>
         ) : null}
       </div>
