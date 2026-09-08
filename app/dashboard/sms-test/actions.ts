@@ -6,7 +6,7 @@ import { basisUrl } from "@/lib/basis-url";
 import { holeAngemeldetenNutzer } from "@/lib/nutzer";
 import { createClient } from "@/lib/supabase/server";
 import { tokenErzeugen, tokenHash } from "@/lib/token";
-import { smsSenden } from "@/lib/twilio";
+import { smsSenden } from "@/lib/bird";
 
 export type Versandzustand = { meldung?: string; ok?: boolean };
 
