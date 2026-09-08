@@ -35,12 +35,21 @@ export function SmsKnopf({
           role="status"
           className={
             zustand.ok
-              ? "text-xs text-emerald-600 dark:text-emerald-500"
-              : "text-xs text-destructive"
+              ? "max-w-xs text-right text-xs text-emerald-600 dark:text-emerald-500"
+              : "max-w-xs text-right text-xs text-destructive"
           }
         >
           {zustand.meldung}
         </span>
+      ) : null}
+
+      {zustand.link ? (
+        <a
+          href={zustand.link}
+          className="max-w-xs break-all text-right text-xs font-medium underline underline-offset-2"
+        >
+          {zustand.link}
+        </a>
       ) : null}
     </div>
   );

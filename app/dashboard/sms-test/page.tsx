@@ -58,11 +58,22 @@ export default async function SmsTest() {
           SMS-Versand testen
         </h1>
         <p className="text-sm text-muted-foreground">
-          Verschickt einen echten Bewertungslink an die beim Betrieb
-          hinterlegte Mobilnummer. Solange matelso fehlt, ist das der einzige
-          Auslöser — später übernimmt das der Webhook zwei Minuten nach
-          Gesprächsende.
+          Erzeugt einen echten Bewertungslink für einen Anruf. Solange matelso
+          fehlt, ist das der einzige Auslöser — später übernimmt das der
+          Webhook zwei Minuten nach Gesprächsende.
         </p>
+
+        {process.env.SMS_TESTMODUS === "an" ? (
+          <div className="rounded-lg border border-dashed bg-muted/40 p-4 text-sm">
+            <p className="font-medium">Testmodus aktiv</p>
+            <p className="mt-1 text-muted-foreground">
+              Es wird keine SMS verschickt. Der erzeugte Link erscheint
+              stattdessen zum Anklicken. Token, Ablage und Gültigkeit sind
+              dabei echt — nur der Versandweg entfällt. Abschalten über
+              SMS_TESTMODUS in .env.local.
+            </p>
+          </div>
+        ) : null}
       </header>
 
       {error ? (

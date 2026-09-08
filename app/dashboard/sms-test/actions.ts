@@ -8,7 +8,23 @@ import { createClient } from "@/lib/supabase/server";
 import { tokenErzeugen, tokenHash } from "@/lib/token";
 import { smsSenden } from "@/lib/bird";
 
-export type Versandzustand = { meldung?: string; ok?: boolean };
+export type Versandzustand = {
+  meldung?: string;
+  ok?: boolean;
+  /** Nur im Testmodus gesetzt: der Link, der sonst per SMS ginge. */
+  link?: string;
+};
+
+/**
+ * Im Testmodus wird nichts verschickt - der Link wird stattdessen angezeigt.
+ *
+ * Gedacht für die Entwicklung, solange der SMS-Versand noch nicht steht,
+ * und später, um ohne Versandkosten zu arbeiten. Muss in .env.local
+ * ausdrücklich eingeschaltet werden.
+ */
+function istTestmodus(): boolean {
+  return process.env.SMS_TESTMODUS === "an";
+}
 
 export async function bewertungssmsSenden(
   anrufId: string,
@@ -38,6 +54,20 @@ export async function bewertungssmsSenden(
 
   if (!eintrag) return { ok: false, meldung: "Anruf nicht gefunden." };
 
+  const link = `${basisUrl()}/bewerten/${token}`;
+
+  // Der Token ist zu diesem Zeitpunkt bereits angelegt und gültig. Im
+  // Testmodus überspringen wir nur den Versand - alles davor ist echt,
+  // der Link funktioniert also genauso wie einer aus einer SMS.
+  if (istTestmodus()) {
+    revalidatePath("/dashboard/sms-test");
+    return {
+      ok: true,
+      meldung: "Testmodus: nichts verschickt. Link zum Ausprobieren:",
+      link,
+    };
+  }
+
   if (!eintrag.telefon) {
     return {
       ok: false,
@@ -45,7 +75,6 @@ export async function bewertungssmsSenden(
     };
   }
 
-  const link = `${basisUrl()}/bewerten/${token}`;
   const text =
     `${eintrag.betrieb_name}: Ist aus dem letzten Anruf ein Auftrag geworden? ` +
     `Bitte kurz bewerten: ${link}`;
