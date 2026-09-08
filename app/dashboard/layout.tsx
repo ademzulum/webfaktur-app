@@ -27,8 +27,14 @@ export default async function DashboardLayout({
     { titel: "Anrufe", pfad: "/dashboard/anrufe" },
   ];
 
+  // Das Ausblenden der Kostenseite ist Bequemlichkeit, kein Schutz. Wer die
+  // Adresse errät, kommt trotzdem nicht an die Zahlen: Die Zugriffsregeln der
+  // Datenbank liefern ihm nichts. Nachgewiesen in kostenschutz-pruefen.sql.
   if (nutzer.rolle === "admin") {
-    punkte.push({ titel: "Betriebe", pfad: "/dashboard/betriebe" });
+    punkte.push(
+      { titel: "Betriebe", pfad: "/dashboard/betriebe" },
+      { titel: "Kosten", pfad: "/dashboard/kosten" },
+    );
   }
 
   return (

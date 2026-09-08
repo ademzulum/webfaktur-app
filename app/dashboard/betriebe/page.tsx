@@ -138,6 +138,13 @@ export default async function BetriebeUebersicht() {
                 >
                   Zugänge
                 </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  render={<Link href={`/dashboard/kosten/${betrieb.id}`} />}
+                >
+                  Preise
+                </Button>
               </div>
             </article>
           ))}
