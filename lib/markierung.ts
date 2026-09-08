@@ -5,15 +5,21 @@
  * Paketauswahl. Vorher hatte jede Stelle ihre eigene Rechnung, und zwei
  * davon waren falsch.
  *
- * DER FEHLER, den das hier behebt:
- * Eine Markierung mit "absolute" wird nicht am äußeren Rand ihres Behälters
- * ausgerichtet, sondern am INNENbereich - also hinter Rahmen und
- * Innenabstand. Gemessen wurde aber vom äußeren Rand. Bei einem Behälter mit
- * 4 Pixel Innenabstand saß die Markierung deshalb 4 Pixel zu weit rechts,
- * bei jedem Eintrag gleich - und beim letzten lief sie aus dem Kasten
- * heraus. Sichtbar wurde es erst dort, wo rechts kein Platz mehr war.
+ * WOVON DIE MARKIERUNG AUSGEHT - der Punkt, an dem es zweimal schiefging:
+ * Eine Markierung mit "absolute" beginnt bei "links: 0" hinter dem RAHMEN
+ * des Behälters, aber VOR dessen Innenabstand. Nicht am äußeren Rand, und
+ * auch nicht am Anfang des Inhalts.
  *
- * Deshalb werden Rahmen und Innenabstand hier abgezogen.
+ * Gemessen wird dagegen vom äußeren Rand. Abzuziehen ist deshalb genau die
+ * Rahmenstärke - nicht mehr und nicht weniger:
+ *
+ *   nichts abgezogen  -> um Rahmen + Innenabstand zu weit rechts
+ *   beides abgezogen  -> um den Innenabstand zu weit links
+ *   nur der Rahmen    -> richtig
+ *
+ * Im Kopfmenü hat der Behälter weder Rahmen noch Innenabstand. Dort waren
+ * alle drei Rechnungen gleich, und deshalb sah es dort immer richtig aus -
+ * während dieselbe Rechnung bei Kategorien und Paketauswahl danebenlag.
  */
 export function bewegeMarkierung(
   markierung: HTMLElement | null,
@@ -34,10 +40,8 @@ export function bewegeMarkierung(
   if (feld.width === 0 || feld.height === 0) return;
   const stil = getComputedStyle(behaelter);
 
-  const versatzLinks =
-    parseFloat(stil.borderLeftWidth) + parseFloat(stil.paddingLeft);
-  const versatzOben =
-    parseFloat(stil.borderTopWidth) + parseFloat(stil.paddingTop);
+  const versatzLinks = parseFloat(stil.borderLeftWidth);
+  const versatzOben = parseFloat(stil.borderTopWidth);
 
   // Der Rollstand zählt mit: Lässt sich die Reihe seitlich schieben, stimmt
   // die reine Bildschirmposition nicht mehr mit der Position innerhalb der
