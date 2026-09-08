@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
 
 import { Kennzahlreihe } from "@/components/kennzahl";
-import { Filterreihe } from "@/components/ui/filterreihe";
+import { Kategoriewahl } from "@/components/ui/kategoriewahl";
+import { Sortierwahl } from "@/components/ui/sortierwahl";
 import { centAlsEuro } from "@/lib/geld";
 import { holeAngemeldetenNutzer } from "@/lib/nutzer";
 import { einzelwert } from "@/lib/postgrest";
@@ -223,8 +224,8 @@ export default async function Anrufauswertung({
           ) : null}
 
           <section>
-            <div className="mb-5 flex flex-wrap items-center gap-3">
-              <Filterreihe
+            <div className="mb-6 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-b border-border pb-4">
+              <Kategoriewahl
                 pfad={PFAD}
                 parameter="zustand"
                 aktuell={zustand}
@@ -242,12 +243,11 @@ export default async function Anrufauswertung({
                 ]}
               />
 
-              <Filterreihe
+              <Sortierwahl
                 pfad={PFAD}
                 parameter="sortierung"
                 aktuell={sortierung}
                 weitere={{ zustand }}
-                beschriftung="Reihenfolge"
                 optionen={[
                   { wert: "neu", titel: "Neueste" },
                   { wert: "alt", titel: "Älteste" },

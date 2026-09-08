@@ -307,6 +307,16 @@
     animation-delay: calc(var(--verzoegerung, 0) * 70ms);
   }
 
+  /* Seitlich rollbare Reihen ohne sichtbare Rollleiste. Am Telefon
+     passen die Kategorien sonst nicht nebeneinander, und eine Leiste
+     unter vier Wörtern sieht nach Fehler aus. */
+  .ohne-rollleiste {
+    scrollbar-width: none;
+  }
+  .ohne-rollleiste::-webkit-scrollbar {
+    display: none;
+  }
+
   .federnd {
     transition-property: transform, width, opacity;
     transition-duration: 420ms;
