@@ -71,15 +71,25 @@ export async function smsSenden(an: string, text: string): Promise<SmsErgebnis> 
     };
   }
 
-  const daten = (await antwort.json().catch(() => null)) as
-    | { id?: string; status?: string; message?: string; code?: string }
-    | null;
+  // Erst als Text lesen, dann erst als JSON deuten. So geht die Begründung
+  // auch dann nicht verloren, wenn Bird ein anderes Feld als "message"
+  // verwendet oder gar kein JSON zurückschickt.
+  const rohtext = await antwort.text();
+  const daten = (() => {
+    try {
+      return JSON.parse(rohtext) as Record<string, unknown>;
+    } catch {
+      return null;
+    }
+  })();
 
   if (!antwort.ok) {
-    const meldung = daten?.message ?? `HTTP ${antwort.status}`;
-    const code = daten?.code ? ` (Bird-Code ${daten.code})` : "";
-    return { ok: false, grund: `${meldung}${code}` };
+    return {
+      ok: false,
+      grund: `HTTP ${antwort.status} - ${rohtext.slice(0, 500) || "keine Begründung mitgeliefert"}`,
+    };
   }
 
-  return { ok: true, id: daten?.id ?? "unbekannt" };
+  const id = typeof daten?.id === "string" ? daten.id : "unbekannt";
+  return { ok: true, id };
 }
