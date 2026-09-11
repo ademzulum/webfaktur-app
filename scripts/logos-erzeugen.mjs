@@ -63,6 +63,15 @@ export function ${name}({ className }: { className?: string }) {
 `;
 }
 
+/** Nur die Pfaddaten, ohne Umhüllung - für den Ladeschirm. */
+function nurPfade(quelle) {
+  const roh = readFileSync(quelle, "utf8");
+  const viewBox = /viewBox="([^"]+)"/.exec(roh)[1];
+  const inhalt = /<g id="Ebene_1-2">([\s\S]*?)<\/g>\s*<\/svg>/.exec(roh)[1];
+  const d = [...inhalt.matchAll(/\sd="([^"]+)"/g)].map((t) => t[1]);
+  return { viewBox, d };
+}
+
 writeFileSync(
   "components/marke/wortmarke.tsx",
   umwandeln("images/webfaktur_wortmarke.svg", {
@@ -79,4 +88,20 @@ writeFileSync(
   }),
 );
 
-console.log("beide Komponenten erzeugt");
+const marke = nurPfade("images/logomark.svg");
+writeFileSync(
+  "components/marke/pfade.ts",
+  `// Erzeugt aus images/logomark.svg - nicht von Hand bearbeiten.
+//
+// Die nackten Pfaddaten der Bildmarke. Gebraucht vom Ladeschirm, der ein
+// eigenes SVG mit einer Maske darüber aufbaut und deshalb nicht die
+// fertige Komponente verwenden kann.
+
+export const LOGOMARK_VIEWBOX = "${marke.viewBox}";
+
+export const LOGOMARK_PFAD =
+  "${marke.d.join(" ")}";
+`,
+);
+
+console.log("beide Komponenten und pfade.ts erzeugt");
