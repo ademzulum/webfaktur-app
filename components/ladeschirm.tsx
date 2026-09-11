@@ -14,19 +14,8 @@ import { LOGOMARK_PFAD, LOGOMARK_VIEWBOX } from "@/components/marke/pfade";
  * die Form läuft. Die Schlaufe musste eigens als Zwischenziel vorgegeben
  * werden, weil der kürzeste Weg sie sonst abkürzt.
  *
- * Am Pfeil läuft der Zug hinein UND wieder heraus: erst hinauf in die
- * Spitze, dann die untere Zacke hinunter - so, wie man einen Pfeil auch von
- * Hand zeichnet.
- *
- * Das ist kein Zierrat. Die untere Zacke des Pfeilkopfs ist unterhalb von
- * y=24 ein eigener Bereich, gut zwölf Einheiten vom Schaft entfernt; der
- * Maskenstrich reicht nur zehneinhalb. Ohne den Rückweg bliebe sie beim
- * Zeichnen unberührt - man sähe nur den dünnen Schaft, und der Pfeil wirkte
- * spitz, obwohl er rund ist.
- *
- * Der letzte Punkt liegt bewusst AUSSERHALB des Logos. Der Maskenstrich
- * endet rund; landet dieser Abschluss außerhalb, rundet er nichts ab, was
- * noch zu sehen sein soll.
+ * Der Zug endet an der SPITZE des Pfeils. Der Kopf selbst - die beiden
+ * Flügel - wird eigens gezeichnet, siehe unten.
  *
  * WENN SICH DAS LOGO ÄNDERT, stimmt diese Linie nicht mehr. Schlimm ist das
  * nicht: Am Ende wird ohnehin die vollständige Bildmarke eingeblendet, es
@@ -64,10 +53,29 @@ const ZUG =
   "Q 92 40.4 93.2 38 Q 94.5 35.5 95.8 33.1 " +
   "Q 97.1 30.7 98.3 28.3 Q 99.5 25.9 100.7 23.4 " +
   "Q 101.9 21 103.5 18.6 Q 105.1 16.1 106.7 13.6 " +
-  "Q 108.2 11.1 109.3 8.7 Q 110.5 6.2 111.7 3.6 " +
-  "Q 112.9 1 112.8 5 Q 112.6 9 112.7 13.5 " +
-  "Q 112.8 18 113.1 22 Q 113.4 26 113.8 29 " +
-  "Q 114.3 32 115 35 L 115.8 38";
+  "Q 108.2 11.1 109.3 8.7 Q 110.5 6.2 111.5 2.5";
+
+/**
+ * Die beiden Flügel des Pfeilkopfs.
+ *
+ * Sie beginnen BEIDE an der Spitze und laufen gleichzeitig nach außen -
+ * einer nach links unten, einer nach rechts unten. So entsteht ein Pfeil
+ * auch von Hand: Der Schaft kommt an, dann öffnet sich der Kopf.
+ *
+ * Nacheinander gezeichnet sähe es aus, als wäre ein Flügel vergessen und
+ * würde nachgereicht.
+ *
+ * Der jeweils letzte Punkt liegt bewusst AUSSERHALB des Logos. Der
+ * Maskenstrich endet rund; landet dieser Abschluss außerhalb, rundet er
+ * nichts ab, was noch zu sehen sein soll.
+ */
+const FLUEGEL_LINKS =
+  "M 111.5 2.5 Q 105 8.5 101.5 11.2 Q 98 14 95 16.2 " +
+  "Q 92 18.5 90.2 20 Q 88.5 21.5 87 22.8 L 85.5 24";
+
+const FLUEGEL_RECHTS =
+  "M 111.5 2.5 Q 112.6 9 112.7 13.5 Q 112.8 18 113.1 22 " +
+  "Q 113.4 26 113.8 29 Q 114.3 32 115 35 L 115.8 38";
 
 /**
  * Der Ladeschirm: Die Bildmarke wird gezeichnet wie von Hand.
@@ -120,6 +128,21 @@ export function Ladeschirm() {
               strokeLinecap="round"
               strokeLinejoin="round"
             />
+            {/* Beide Flügel tragen dieselbe Klasse und damit dieselbe
+                Verzögerung - sie laufen gleichzeitig los. */}
+            {[FLUEGEL_LINKS, FLUEGEL_RECHTS].map((d) => (
+              <path
+                key={d}
+                d={d}
+                pathLength={1}
+                className="ladeschirm-fluegel"
+                fill="none"
+                stroke="#fff"
+                strokeWidth={21}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            ))}
           </mask>
         </defs>
 
