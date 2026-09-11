@@ -447,21 +447,6 @@ details[open]::details-content {
   }
 }
 
-/* Dasselbe, nur vom anderen Ende her.
-   Der Zug aus Illustrator verläuft vom Pfeil zum linken Strich - gezeichnet
-   werden soll aber von links. Statt die Pfaddaten umzuschreiben, wird die
-   Strichlinie in die andere Richtung geschoben: Bei -1 liegt sie vor dem
-   Pfad und nichts ist zu sehen, bei 0 ist alles sichtbar, und dazwischen
-   wächst der Strich vom ENDE her. */
-@keyframes zug-rueckwaerts {
-  from {
-    stroke-dashoffset: -1;
-  }
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
 @keyframes marke-fuellen {
   to {
     fill-opacity: 1;
@@ -506,7 +491,7 @@ details[open]::details-content {
    Ein Stift wird beim Schreiben nicht langsamer, je weiter er kommt. */
 .ladeschirm-zug {
   stroke-dasharray: 1;
-  animation: zug-rueckwaerts 1300ms cubic-bezier(0.4, 0.1, 0.3, 1) both;
+  animation: zug-zeichnen 1300ms cubic-bezier(0.4, 0.1, 0.3, 1) both;
 }
 
 /* Die beiden Flügel des Pfeilkopfs.

@@ -40,6 +40,11 @@ const FLUEGEL_RECHTS = "M 113.7 6.6 L 116.07 30.7";
  * beide Täler bis zum Pfeilschaft, dann beide Flügel gleichzeitig aus der
  * Spitze nach außen.
  *
+ * Die Richtung stimmt bereits in den Pfaddaten - LOGOMARK_ZUG wird beim
+ * Erzeugen umgedreht. Ein erster Versuch ließ stattdessen die Strichlinie
+ * rückwärts laufen; im Browser sah das aus, als würde das Logo wegradiert
+ * statt gezeichnet.
+ *
  * Reine CSS-Animation, kein Programm im Browser. Würde ein Programm den
  * Schirm steuern, erschiene er erst, NACHDEM dieses geladen ist - also
  * genau dann nicht, wenn man ihn braucht.

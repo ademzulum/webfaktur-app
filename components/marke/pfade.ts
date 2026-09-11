@@ -14,14 +14,15 @@ export const LOGOMARK_PFAD =
  * Die Linie, die der Stift genommen hat - die Mittellinie der Fläche.
  * Aus Illustrator, nicht zurückgerechnet.
  *
- * ZUG verläuft vom Pfeil zum linken Strich, also RÜCKWÄRTS. Gezeichnet wird
- * trotzdem von links: Der Ladeschirm dreht die Richtung um, statt die
- * Pfaddaten umzuschreiben.
+ * ZUG ist gegenüber der Illustrator-Datei UMGEDREHT: Dort verläuft die Linie
+ * vom Pfeil nach links, gezeichnet werden soll aber von links. Das Umdrehen
+ * passiert beim Erzeugen, damit beim Zeichnen selbst nichts zu verdrehen
+ * bleibt.
  *
  * PFEIL ist der Pfeilkopf: ein V mit abgerundeter Spitze in der Mitte.
  */
 export const LOGOMARK_ZUG =
-  "M110.95,11.21c-14.61,23.37-18.89,38.08-33.56,61.6-1.62,2.6-4.61,4.37-7.65,4.03-1.19-.13-2.4-.45-3.67-1.24-7.21-4.5-5.65-19.22,4.98-42.7,3.55-7.83.99-14.03-2.86-16.39-2.16-1.33-5.36-1.62-8.29-.12-4.84,2.48-6.39,8.56-6.98,10.68-3.4,12.27-.2,49.49-16.03,48.72-10.63-.52-17.85-24.59-17.85-24.59-5.35-14.43-10.48-29.52-1.6-35.13l.19-.11c6.17-3.4,13.54,2.23,12.15,9.13-1.79,8.87-10.58,18.97-20.95,20.65l-7.74,1.43";
+  "M1.09,47.17L8.83,45.74C19.2,44.06 27.99,33.96 29.78,25.09C31.17,18.19 23.8,12.56 17.63,15.96L17.44,16.07C8.56,21.68 13.69,36.77 19.04,51.2C19.04,51.2 26.26,75.27 36.89,75.79C52.72,76.56 49.52,39.34 52.92,27.07C53.51,24.95 55.06,18.87 59.9,16.39C62.83,14.89 66.03,15.18 68.19,16.51C72.04,18.87 74.6,25.07 71.05,32.9C60.42,56.38 58.86,71.1 66.07,75.6C67.34,76.39 68.55,76.71 69.74,76.84C72.78,77.18 75.77,75.41 77.39,72.81C92.06,49.29 96.34,34.58 110.95,11.21";
 
 export const LOGOMARK_PFEIL =
   "M91.07,17.01l21.61-10.77c.47-.34,1.05-.3,1.46-.02.33.22.56.6.56,1.06l1.37,23.42";

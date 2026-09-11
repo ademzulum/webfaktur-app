@@ -88,6 +88,88 @@ writeFileSync(
   }),
 );
 
+
+/**
+ * Dreht einen Pfad um: aus "von A nach B" wird "von B nach A".
+ *
+ * Gebraucht für den Ladeschirm. Der Zug aus Illustrator verläuft vom Pfeil
+ * zum linken Strich, gezeichnet werden soll aber von links.
+ *
+ * Der naheliegende Trick wäre, die Strichlinie beim Zeichnen rückwärts
+ * laufen zu lassen. Das sah im Browser aus, als würde das Logo wegradiert -
+ * deshalb wird hier der Pfad selbst umgedreht. Das Ergebnis ist dieselbe
+ * Linie, nur andersherum durchlaufen, und beim Zeichnen gibt es nichts mehr
+ * zu verdrehen.
+ *
+ * Eine umgedrehte Kurve behält ihre Form: Anfang und Ende tauschen, und die
+ * beiden Griffe dazwischen ebenfalls.
+ */
+function umdrehen(d) {
+  const zahl = /[-+]?(?:\d*\.\d+|\d+)(?:[eE][-+]?\d+)?/g;
+  const stuecke = [...d.matchAll(/([MmLlHhVvCcSsZz])([^MmLlHhVvCcSsZz]*)/g)];
+
+  let cur = [0, 0];
+  let letzterGriff = null;
+  const segmente = [];
+
+  for (const [, befehl, rest] of stuecke) {
+    const w = (rest.match(zahl) || []).map(Number);
+    const rel = befehl === befehl.toLowerCase();
+    let art = befehl.toUpperCase();
+    let i = 0;
+    if (art === "Z") continue;
+
+    while (i < w.length) {
+      if (art === "M") {
+        let [x, y] = [w[i], w[i + 1]]; i += 2;
+        if (rel) { x += cur[0]; y += cur[1]; }
+        cur = [x, y]; letzterGriff = null; art = "L";
+      } else if (art === "L" || art === "H" || art === "V") {
+        let x, y;
+        if (art === "L") { x = w[i]; y = w[i + 1]; i += 2; if (rel) { x += cur[0]; y += cur[1]; } }
+        else if (art === "H") { x = w[i]; i += 1; if (rel) x += cur[0]; y = cur[1]; }
+        else { y = w[i]; i += 1; if (rel) y += cur[1]; x = cur[0]; }
+        segmente.push({ art: "L", von: cur, nach: [x, y] });
+        cur = [x, y]; letzterGriff = null;
+      } else if (art === "C" || art === "S") {
+        let g1, g2, p;
+        if (art === "C") {
+          g1 = [w[i], w[i + 1]]; g2 = [w[i + 2], w[i + 3]]; p = [w[i + 4], w[i + 5]]; i += 6;
+          if (rel) {
+            g1 = [g1[0] + cur[0], g1[1] + cur[1]];
+            g2 = [g2[0] + cur[0], g2[1] + cur[1]];
+            p = [p[0] + cur[0], p[1] + cur[1]];
+          }
+        } else {
+          g2 = [w[i], w[i + 1]]; p = [w[i + 2], w[i + 3]]; i += 4;
+          if (rel) {
+            g2 = [g2[0] + cur[0], g2[1] + cur[1]];
+            p = [p[0] + cur[0], p[1] + cur[1]];
+          }
+          g1 = letzterGriff
+            ? [2 * cur[0] - letzterGriff[0], 2 * cur[1] - letzterGriff[1]]
+            : cur;
+        }
+        segmente.push({ art: "C", von: cur, g1, g2, nach: p });
+        letzterGriff = g2; cur = p;
+      } else {
+        i = w.length;
+      }
+    }
+  }
+
+  const r = (n) => Number(n.toFixed(2));
+  const letzte = segmente[segmente.length - 1].nach;
+  let out = `M${r(letzte[0])},${r(letzte[1])}`;
+  for (let k = segmente.length - 1; k >= 0; k--) {
+    const s = segmente[k];
+    out += s.art === "L"
+      ? `L${r(s.von[0])},${r(s.von[1])}`
+      : `C${r(s.g2[0])},${r(s.g2[1])} ${r(s.g1[0])},${r(s.g1[1])} ${r(s.von[0])},${r(s.von[1])}`;
+  }
+  return out;
+}
+
 const marke = nurPfade("images/logomark.svg");
 const zug = nurPfade("images/logomark-path.svg");
 
@@ -125,14 +207,15 @@ export const LOGOMARK_PFAD =
  * Die Linie, die der Stift genommen hat - die Mittellinie der Fläche.
  * Aus Illustrator, nicht zurückgerechnet.
  *
- * ZUG verläuft vom Pfeil zum linken Strich, also RÜCKWÄRTS. Gezeichnet wird
- * trotzdem von links: Der Ladeschirm dreht die Richtung um, statt die
- * Pfaddaten umzuschreiben.
+ * ZUG ist gegenüber der Illustrator-Datei UMGEDREHT: Dort verläuft die Linie
+ * vom Pfeil nach links, gezeichnet werden soll aber von links. Das Umdrehen
+ * passiert beim Erzeugen, damit beim Zeichnen selbst nichts zu verdrehen
+ * bleibt.
  *
  * PFEIL ist der Pfeilkopf: ein V mit abgerundeter Spitze in der Mitte.
  */
 export const LOGOMARK_ZUG =
-  "${zug.d[0]}";
+  "${umdrehen(zug.d[0])}";
 
 export const LOGOMARK_PFEIL =
   "${zug.d[1]}";
