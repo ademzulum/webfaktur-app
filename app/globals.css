@@ -447,6 +447,21 @@ details[open]::details-content {
   }
 }
 
+/* Dasselbe, nur vom anderen Ende her.
+   Der Zug aus Illustrator verläuft vom Pfeil zum linken Strich - gezeichnet
+   werden soll aber von links. Statt die Pfaddaten umzuschreiben, wird die
+   Strichlinie in die andere Richtung geschoben: Bei -1 liegt sie vor dem
+   Pfad und nichts ist zu sehen, bei 0 ist alles sichtbar, und dazwischen
+   wächst der Strich vom ENDE her. */
+@keyframes zug-rueckwaerts {
+  from {
+    stroke-dashoffset: -1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
 @keyframes marke-fuellen {
   to {
     fill-opacity: 1;
@@ -472,7 +487,7 @@ details[open]::details-content {
      durch den Schirm hindurch auf die Seite darunter. */
   pointer-events: none;
 
-  animation: ladeschirm-weg 450ms var(--ease-weich) 1950ms both;
+  animation: ladeschirm-weg 450ms var(--ease-weich) 1920ms both;
 }
 
 /* Zweiter Besuch in derselben Sitzung: gar nicht erst zeigen. Einmal ist
@@ -491,7 +506,7 @@ details[open]::details-content {
    Ein Stift wird beim Schreiben nicht langsamer, je weiter er kommt. */
 .ladeschirm-zug {
   stroke-dasharray: 1;
-  animation: zug-zeichnen 1200ms cubic-bezier(0.4, 0.1, 0.3, 1) both;
+  animation: zug-rueckwaerts 1300ms cubic-bezier(0.4, 0.1, 0.3, 1) both;
 }
 
 /* Die beiden Flügel des Pfeilkopfs.
@@ -499,13 +514,12 @@ details[open]::details-content {
    Gleiche Verzögerung für beide - dadurch öffnen sie sich gleichzeitig nach
    außen, statt dass einer nachgereicht wird.
 
-   Sie beginnen BEWUSST, bevor der Schaft fertig ist. Der Schaft bremst zum
-   Schluss stark ab; wären die Flügel erst danach dran, stünde der Pfeilkopf
-   einen Moment lang mit abgeschnittenen Kanten still. Durch die
-   Überlappung öffnet sich der Kopf, während der Schaft noch ankommt. */
+   Sie beginnen BEWUSST, bevor der Zug fertig ist. Der Zug bremst zum Schluss
+   ab; wären die Flügel erst danach dran, stünde der Pfeil einen Moment lang
+   ohne Kopf da. */
 .ladeschirm-fluegel {
   stroke-dasharray: 1;
-  animation: zug-zeichnen 420ms var(--ease-weich) 1100ms both;
+  animation: zug-zeichnen 360ms var(--ease-weich) 1180ms both;
 }
 
 .ladeschirm-tinte {
@@ -520,7 +534,7 @@ details[open]::details-content {
   /* Beginnt erst, wenn der Zug durch ist - und ist fertig, bevor der Schirm
      weggeht. Vorher überschnitten sich beide: Die vollständige Marke war nie
      ganz zu sehen. */
-  animation: marke-fuellen 280ms var(--ease-weich) 1560ms both;
+  animation: marke-fuellen 260ms var(--ease-weich) 1560ms both;
 }
 
 /* Wer im Betriebssystem "Bewegung reduzieren" eingeschaltet hat, bekommt

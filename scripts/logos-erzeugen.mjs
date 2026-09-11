@@ -89,18 +89,56 @@ writeFileSync(
 );
 
 const marke = nurPfade("images/logomark.svg");
+const zug = nurPfade("images/logomark-path.svg");
+
+// Die beiden Dateien zeigen dasselbe Logo, aber unterschiedlich:
+//   logomark.svg       die FLAECHE - der Umriss der fertigen Marke
+//   logomark-path.svg  die LINIE   - der Weg, den der Stift genommen hat,
+//                                    mit 12 Einheiten Konturstaerke
+//
+// Die Linie ist genau die Mittellinie der Flaeche. Nachgemessen: 229 von 230
+// Abtastpunkten liegen innerhalb der Flaeche, mit im Mittel 5,6 Einheiten
+// Abstand zum Rand - also der halben Konturstaerke, wie es sein muss.
+//
+// Illustrator hat die Linienfassung mit etwas mehr Rand exportiert. Der
+// Unterschied der beiden Zeichenflaechen, halbiert, ergibt den Versatz, der
+// die Linie ueber die Flaeche legt.
+const [, , fb, fh] = marke.viewBox.split(/\s+/).map(Number);
+const [, , zb, zh] = zug.viewBox.split(/\s+/).map(Number);
+const versatz = `translate(${((fb - zb) / 2).toFixed(3)} ${((fh - zh) / 2).toFixed(3)})`;
+
 writeFileSync(
   "components/marke/pfade.ts",
-  `// Erzeugt aus images/logomark.svg - nicht von Hand bearbeiten.
+  `// Erzeugt aus images/logomark.svg und images/logomark-path.svg -
+// nicht von Hand bearbeiten.
 //
-// Die nackten Pfaddaten der Bildmarke. Gebraucht vom Ladeschirm, der ein
-// eigenes SVG mit einer Maske darüber aufbaut und deshalb nicht die
-// fertige Komponente verwenden kann.
+// Gebraucht vom Ladeschirm, der ein eigenes SVG mit einer Maske darüber
+// aufbaut und deshalb nicht die fertige Komponente verwenden kann.
 
+/** Die Fläche der Bildmarke - das, was am Ende zu sehen ist. */
 export const LOGOMARK_VIEWBOX = "${marke.viewBox}";
 
 export const LOGOMARK_PFAD =
   "${marke.d.join(" ")}";
+
+/**
+ * Die Linie, die der Stift genommen hat - die Mittellinie der Fläche.
+ * Aus Illustrator, nicht zurückgerechnet.
+ *
+ * ZUG verläuft vom Pfeil zum linken Strich, also RÜCKWÄRTS. Gezeichnet wird
+ * trotzdem von links: Der Ladeschirm dreht die Richtung um, statt die
+ * Pfaddaten umzuschreiben.
+ *
+ * PFEIL ist der Pfeilkopf: ein V mit abgerundeter Spitze in der Mitte.
+ */
+export const LOGOMARK_ZUG =
+  "${zug.d[0]}";
+
+export const LOGOMARK_PFEIL =
+  "${zug.d[1]}";
+
+/** Legt die Linie deckungsgleich über die Fläche. */
+export const LOGOMARK_ZUG_VERSATZ = "${versatz}";
 `,
 );
 

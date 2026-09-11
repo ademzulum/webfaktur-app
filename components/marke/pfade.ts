@@ -1,10 +1,30 @@
-// Erzeugt aus images/logomark.svg - nicht von Hand bearbeiten.
+// Erzeugt aus images/logomark.svg und images/logomark-path.svg -
+// nicht von Hand bearbeiten.
 //
-// Die nackten Pfaddaten der Bildmarke. Gebraucht vom Ladeschirm, der ein
-// eigenes SVG mit einer Maske darüber aufbaut und deshalb nicht die
-// fertige Komponente verwenden kann.
+// Gebraucht vom Ladeschirm, der ein eigenes SVG mit einer Maske darüber
+// aufbaut und deshalb nicht die fertige Komponente verwenden kann.
 
+/** Die Fläche der Bildmarke - das, was am Ende zu sehen ist. */
 export const LOGOMARK_VIEWBOX = "0 0 119.25 80.99";
 
 export const LOGOMARK_PFAD =
   "M119.24,29.66l-1.34-22.77c-.09-2.58-1.54-4.9-3.85-6.09-2.19-1.13-4.76-1.05-6.85.18l-20.85,10.4c-2.9,1.44-4.07,4.96-2.63,7.86,1.44,2.9,4.96,4.08,7.86,2.63l5.05-2.52c-3.8,6.81-6.87,13-9.87,19.05-4.69,9.46-9.12,18.39-16.13,29.63-.51.82-1.37,1.27-1.85,1.21-.51-.06-.81-.15-1.14-.36-2.28-1.42-3.73-10.42,7.1-34.32,4.95-10.93.84-19.8-5.07-23.43-4.07-2.5-9.37-2.63-13.83-.34-6.89,3.53-8.97,11.08-9.74,13.92l-.05.17c-1.08,3.9-1.51,9.31-2.02,15.57-.73,9.09-2.43,29.07-7.85,28.81-3.19-.15-8.93-10.88-11.96-20.93l-.12-.35c-.4-1.08-.84-2.27-1.3-3.54,6.32-5.01,10.73-12.21,12.05-18.78,1.09-5.44-1.03-10.88-5.54-14.19-4.43-3.26-10.15-3.65-14.9-1.03l-.49.3c-9.19,5.81-8.41,17-5.33,27.98-.3.07-.59.13-.89.17l-7.68,1.42,2.12,11.53,7.5-1.38c.9-.15,1.79-.34,2.66-.59.25.68.5,1.35.75,2.02,1.51,4.99,8.91,28.42,22.57,29.08,5.46.27,12.75-2.11,16.54-14.93,2.09-7.06,2.94-16.91,3.56-24.65.44-5.43.85-10.56,1.63-13.38l.05-.19c.41-1.48,1.49-5.41,3.78-6.59,1.01-.51,1.97-.34,2.37-.1,1.34.82,2.66,3.88.52,8.6-12.05,26.62-12.91,42.68-2.63,49.1,1.82,1.14,3.8,1.81,6.04,2.07.46.05.93.08,1.39.08,4.61,0,9.1-2.54,11.71-6.73,7.32-11.72,12.08-21.33,16.69-30.63,3.14-6.34,6.17-12.44,9.93-19.15l.34,5.88c.18,3.11,2.76,5.52,5.84,5.52.12,0,.23,0,.35,0,3.23-.19,5.7-2.96,5.51-6.19ZM20.11,20.69c.93-.48,1.74-.14,2.25.24.39.28,1.25,1.08.99,2.42-.56,2.76-2.14,5.83-4.39,8.51-1.11-5.14-1.23-9.59,1.15-11.17Z";
+
+/**
+ * Die Linie, die der Stift genommen hat - die Mittellinie der Fläche.
+ * Aus Illustrator, nicht zurückgerechnet.
+ *
+ * ZUG verläuft vom Pfeil zum linken Strich, also RÜCKWÄRTS. Gezeichnet wird
+ * trotzdem von links: Der Ladeschirm dreht die Richtung um, statt die
+ * Pfaddaten umzuschreiben.
+ *
+ * PFEIL ist der Pfeilkopf: ein V mit abgerundeter Spitze in der Mitte.
+ */
+export const LOGOMARK_ZUG =
+  "M110.95,11.21c-14.61,23.37-18.89,38.08-33.56,61.6-1.62,2.6-4.61,4.37-7.65,4.03-1.19-.13-2.4-.45-3.67-1.24-7.21-4.5-5.65-19.22,4.98-42.7,3.55-7.83.99-14.03-2.86-16.39-2.16-1.33-5.36-1.62-8.29-.12-4.84,2.48-6.39,8.56-6.98,10.68-3.4,12.27-.2,49.49-16.03,48.72-10.63-.52-17.85-24.59-17.85-24.59-5.35-14.43-10.48-29.52-1.6-35.13l.19-.11c6.17-3.4,13.54,2.23,12.15,9.13-1.79,8.87-10.58,18.97-20.95,20.65l-7.74,1.43";
+
+export const LOGOMARK_PFEIL =
+  "M91.07,17.01l21.61-10.77c.47-.34,1.05-.3,1.46-.02.33.22.56.6.56,1.06l1.37,23.42";
+
+/** Legt die Linie deckungsgleich über die Fläche. */
+export const LOGOMARK_ZUG_VERSATZ = "translate(-1.410 -0.945)";
