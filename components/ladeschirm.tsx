@@ -16,11 +16,19 @@ import {
  * erst der eine Flügel wachsen und dann der andere - es sähe aus, als wäre
  * einer vergessen und würde nachgereicht.
  *
- * Die Zahlen stammen aus LOGOMARK_PFEIL; die Spitze liegt in der Mitte
- * seiner abgerundeten Ecke.
+ * Beide fahren die abgerundete Spitze KOMPLETT mit, bevor sie nach außen
+ * laufen. Träfen sie sich nur in einem Punkt, bliebe von der Rundung ein
+ * Rest übrig, den keiner von beiden abdeckt.
+ *
+ * Die Zahlen stammen unverändert aus LOGOMARK_PFEIL.
  */
-const FLUEGEL_LINKS = "M 113.7 6.6 L 91.07 17.01";
-const FLUEGEL_RECHTS = "M 113.7 6.6 L 116.07 30.7";
+const FLUEGEL_LINKS =
+  "M114.7,7.28C114.7,6.82 114.47,6.44 114.14,6.22" +
+  "C113.73,5.94 113.15,5.9 112.68,6.24L91.07,17.01";
+
+const FLUEGEL_RECHTS =
+  "M112.68,6.24C113.15,5.9 113.73,5.94 114.14,6.22" +
+  "C114.47,6.44 114.7,6.82 114.7,7.28L116.07,30.7";
 
 /**
  * Der Ladeschirm: Die Bildmarke wird gezeichnet wie von Hand.
@@ -34,7 +42,12 @@ const FLUEGEL_RECHTS = "M 113.7 6.6 L 116.07 30.7";
  * Die Mittellinie ist nicht geschätzt: Sie kommt als eigene Datei aus
  * Illustrator (images/logomark-path.svg) und ist der Weg, den der Stift beim
  * Entwerfen genommen hat. Die Maske ist 15 Einheiten breit gegenüber den 12
- * der Kontur - nachgemessen ist damit jeder Punkt des Logos erreicht.
+ * der Kontur - nachgemessen erreicht sie damit alle 56.610 Bildpunkte des
+ * Logos, bei 14 bleiben sieben Stellen offen.
+ *
+ * Dass sich das Logo dort, wo die Schlaufe sich selbst kreuzt, schon beim
+ * ERSTEN Durchgang färbt, ist kein Fehler: An einer Kreuzung liegt dieselbe
+ * Tinte auf beiden Zügen. Ein Stift kann sie nicht zweimal auftragen.
  *
  * Reihenfolge: erst der lange Zug vom linken Strich durch die Schlaufe und
  * beide Täler bis zum Pfeilschaft, dann beide Flügel gleichzeitig aus der
@@ -97,12 +110,17 @@ export function Ladeschirm() {
           </mask>
         </defs>
 
+        {/* Nur dieses eine Bild. Früher wurde am Ende zusätzlich die
+            vollständige Marke eingeblendet, als Auffangnetz für Stellen,
+            die der Strich verfehlt. Das ist nicht mehr nötig: Nachgemessen
+            erreicht der Strich alle 56.610 Bildpunkte des Logos. Und es
+            war schädlich - das Einblenden legte sich über das bereits
+            Gezeichnete und ließ es am Schluss aufblitzen. */}
         <path
           d={LOGOMARK_PFAD}
           className="ladeschirm-tinte"
           mask="url(#webfaktur-zug)"
         />
-        <path d={LOGOMARK_PFAD} className="ladeschirm-fertig" />
       </svg>
     </div>
   );

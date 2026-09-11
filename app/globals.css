@@ -447,12 +447,6 @@ details[open]::details-content {
   }
 }
 
-@keyframes marke-fuellen {
-  to {
-    fill-opacity: 1;
-  }
-}
-
 @keyframes ladeschirm-weg {
   to {
     opacity: 0;
@@ -472,7 +466,7 @@ details[open]::details-content {
      durch den Schirm hindurch auf die Seite darunter. */
   pointer-events: none;
 
-  animation: ladeschirm-weg 450ms var(--ease-weich) 1920ms both;
+  animation: ladeschirm-weg 450ms var(--ease-weich) 1750ms both;
 }
 
 /* Zweiter Besuch in derselben Sitzung: gar nicht erst zeigen. Einmal ist
@@ -509,17 +503,6 @@ details[open]::details-content {
 
 .ladeschirm-tinte {
   fill: var(--color-marke, #ed570d);
-}
-
-/* Die vollständige Bildmarke, zum Schluss. Fängt ab, was der Strich nicht
-   erwischt hat. */
-.ladeschirm-fertig {
-  fill: var(--color-marke, #ed570d);
-  fill-opacity: 0;
-  /* Beginnt erst, wenn der Zug durch ist - und ist fertig, bevor der Schirm
-     weggeht. Vorher überschnitten sich beide: Die vollständige Marke war nie
-     ganz zu sehen. */
-  animation: marke-fuellen 260ms var(--ease-weich) 1560ms both;
 }
 
 /* Wer im Betriebssystem "Bewegung reduzieren" eingeschaltet hat, bekommt
