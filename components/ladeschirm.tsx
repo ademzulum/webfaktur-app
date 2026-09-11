@@ -22,7 +22,7 @@ import { LOGOMARK_PFAD, LOGOMARK_VIEWBOX } from "@/components/marke/pfade";
  * sähe dann nur die Reihenfolge des Zeichnens falsch aus.
  */
 const ZUG =
-  "M 0.9 40.9 Q 10.5 44 11.4 41.9 Q 12.3 39.8 13.2 37.6 " +
+  "M 3 45 Q 10.5 44 11.4 41.9 Q 12.3 39.8 13.2 37.6 " +
   "Q 14.2 35.5 14 33.1 Q 13.8 30.7 13.6 28.3 " +
   "Q 13.3 25.9 14.1 23.4 Q 14.8 21 15.5 18.6 " +
   "Q 16.2 16.2 18.1 15.9 Q 20.1 15.6 22.1 15.3 " +
@@ -124,7 +124,13 @@ export function Ladeschirm() {
               className="ladeschirm-zug"
               fill="none"
               stroke="#fff"
-              strokeWidth={21}
+              // 16 und nicht breiter. Das ist die entscheidende Zahl:
+              // Ein breiterer Strich deckt beim Hinauflaufen schon Teile
+              // der Pfeilflügel mit auf - und zwar quer abgeschnitten,
+              // weil er nur bis zu ihrer Mitte reicht. Bei 21 waren das
+              // 34 Punkte, bei 16 sind es 10. Schmaler geht nicht: ab 15
+              // bleiben Stellen des Logos ganz unerreicht.
+              strokeWidth={16}
               strokeLinecap="round"
               strokeLinejoin="round"
             />
@@ -139,10 +145,9 @@ export function Ladeschirm() {
                 fill="none"
                 stroke="#fff"
                 // Breiter als der Schaft: Der Pfeilkopf ist die breiteste
-                // Stelle des ganzen Logos. Mit 21 bliebe an seinen Kanten
-                // ein Rand stehen, bis am Ende die vollständige Marke
-                // einblendet - und genau das sähe nach Nachbessern aus.
-                strokeWidth={27}
+                // Stelle des ganzen Logos. Zusammen mit den 16 des Schafts
+                // ist damit jeder Punkt des Logos erreicht - nachgerechnet.
+                strokeWidth={24}
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />

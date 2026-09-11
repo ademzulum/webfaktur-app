@@ -472,7 +472,7 @@ details[open]::details-content {
      durch den Schirm hindurch auf die Seite darunter. */
   pointer-events: none;
 
-  animation: ladeschirm-weg 450ms var(--ease-weich) 1900ms both;
+  animation: ladeschirm-weg 450ms var(--ease-weich) 1950ms both;
 }
 
 /* Zweiter Besuch in derselben Sitzung: gar nicht erst zeigen. Einmal ist
@@ -491,7 +491,7 @@ details[open]::details-content {
    Ein Stift wird beim Schreiben nicht langsamer, je weiter er kommt. */
 .ladeschirm-zug {
   stroke-dasharray: 1;
-  animation: zug-zeichnen 1250ms cubic-bezier(0.4, 0.1, 0.3, 1) both;
+  animation: zug-zeichnen 1200ms cubic-bezier(0.4, 0.1, 0.3, 1) both;
 }
 
 /* Die beiden Flügel des Pfeilkopfs.
@@ -505,7 +505,7 @@ details[open]::details-content {
    Überlappung öffnet sich der Kopf, während der Schaft noch ankommt. */
 .ladeschirm-fluegel {
   stroke-dasharray: 1;
-  animation: zug-zeichnen 420ms var(--ease-weich) 1000ms both;
+  animation: zug-zeichnen 420ms var(--ease-weich) 1100ms both;
 }
 
 .ladeschirm-tinte {
@@ -520,7 +520,7 @@ details[open]::details-content {
   /* Beginnt erst, wenn der Zug durch ist - und ist fertig, bevor der Schirm
      weggeht. Vorher überschnitten sich beide: Die vollständige Marke war nie
      ganz zu sehen. */
-  animation: marke-fuellen 300ms var(--ease-weich) 1480ms both;
+  animation: marke-fuellen 280ms var(--ease-weich) 1560ms both;
 }
 
 /* Wer im Betriebssystem "Bewegung reduzieren" eingeschaltet hat, bekommt
