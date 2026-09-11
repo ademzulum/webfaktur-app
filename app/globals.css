@@ -472,7 +472,7 @@ details[open]::details-content {
      durch den Schirm hindurch auf die Seite darunter. */
   pointer-events: none;
 
-  animation: ladeschirm-weg 450ms var(--ease-weich) 1950ms both;
+  animation: ladeschirm-weg 450ms var(--ease-weich) 1900ms both;
 }
 
 /* Zweiter Besuch in derselben Sitzung: gar nicht erst zeigen. Einmal ist
@@ -494,12 +494,18 @@ details[open]::details-content {
   animation: zug-zeichnen 1250ms cubic-bezier(0.4, 0.1, 0.3, 1) both;
 }
 
-/* Die beiden Flügel des Pfeilkopfs. Gleiche Verzögerung für beide - dadurch
-   öffnen sie sich gleichzeitig nach außen, statt dass einer nachgereicht
-   wird. */
+/* Die beiden Flügel des Pfeilkopfs.
+
+   Gleiche Verzögerung für beide - dadurch öffnen sie sich gleichzeitig nach
+   außen, statt dass einer nachgereicht wird.
+
+   Sie beginnen BEWUSST, bevor der Schaft fertig ist. Der Schaft bremst zum
+   Schluss stark ab; wären die Flügel erst danach dran, stünde der Pfeilkopf
+   einen Moment lang mit abgeschnittenen Kanten still. Durch die
+   Überlappung öffnet sich der Kopf, während der Schaft noch ankommt. */
 .ladeschirm-fluegel {
   stroke-dasharray: 1;
-  animation: zug-zeichnen 320ms var(--ease-weich) 1250ms both;
+  animation: zug-zeichnen 420ms var(--ease-weich) 1000ms both;
 }
 
 .ladeschirm-tinte {
@@ -514,7 +520,7 @@ details[open]::details-content {
   /* Beginnt erst, wenn der Zug durch ist - und ist fertig, bevor der Schirm
      weggeht. Vorher überschnitten sich beide: Die vollständige Marke war nie
      ganz zu sehen. */
-  animation: marke-fuellen 300ms var(--ease-weich) 1600ms both;
+  animation: marke-fuellen 300ms var(--ease-weich) 1480ms both;
 }
 
 /* Wer im Betriebssystem "Bewegung reduzieren" eingeschaltet hat, bekommt

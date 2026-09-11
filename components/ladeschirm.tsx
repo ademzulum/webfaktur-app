@@ -138,7 +138,11 @@ export function Ladeschirm() {
                 className="ladeschirm-fluegel"
                 fill="none"
                 stroke="#fff"
-                strokeWidth={21}
+                // Breiter als der Schaft: Der Pfeilkopf ist die breiteste
+                // Stelle des ganzen Logos. Mit 21 bliebe an seinen Kanten
+                // ein Rand stehen, bis am Ende die vollständige Marke
+                // einblendet - und genau das sähe nach Nachbessern aus.
+                strokeWidth={27}
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
