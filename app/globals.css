@@ -472,7 +472,7 @@ details[open]::details-content {
      durch den Schirm hindurch auf die Seite darunter. */
   pointer-events: none;
 
-  animation: ladeschirm-weg 450ms var(--ease-weich) 1800ms both;
+  animation: ladeschirm-weg 450ms var(--ease-weich) 1900ms both;
 }
 
 /* Zweiter Besuch in derselben Sitzung: gar nicht erst zeigen. Einmal ist
@@ -503,7 +503,10 @@ details[open]::details-content {
 .ladeschirm-fertig {
   fill: var(--color-marke, #ed570d);
   fill-opacity: 0;
-  animation: marke-fuellen 400ms var(--ease-weich) 1350ms both;
+  /* Beginnt erst, wenn der Zug durch ist - und ist fertig, bevor der Schirm
+     weggeht. Vorher überschnitten sich beide: Die vollständige Marke war nie
+     ganz zu sehen. */
+  animation: marke-fuellen 350ms var(--ease-weich) 1400ms both;
 }
 
 /* Wer im Betriebssystem "Bewegung reduzieren" eingeschaltet hat, bekommt
