@@ -34,6 +34,7 @@ export default async function DashboardLayout({
     punkte.push(
       { titel: "Betriebe", pfad: "/dashboard/betriebe" },
       { titel: "Kosten", pfad: "/dashboard/kosten" },
+      { titel: "SMS", pfad: "/dashboard/sms-test" },
     );
   }
 
