@@ -420,6 +420,82 @@ details[open]::details-content {
   block-size: auto;
 }
 
+/* ==========================================================================
+   LADESCHIRM
+
+   Die Bildmarke wird gezeichnet, füllt sich, dann blendet der Schirm weg.
+
+   Wie das Zeichnen funktioniert: Der Pfad bekommt eine Strichlinie, deren
+   Strich genau so lang ist wie er selbst. Wird die Linie um ihre volle Länge
+   verschoben, ist nichts zu sehen; wandert sie auf null zurück, kommt der
+   Pfad Stück für Stück hervor. Möglich ist das nur, weil die Pfadlänge im
+   Logo auf 1 normiert ist - siehe scripts/logos-erzeugen.mjs.
+
+   Der Hintergrund ist die Hintergrundfarbe der Ansicht, nicht fest Schwarz:
+   Wer hell eingestellt hat, bekäme sonst einen schwarzen Schirm und danach
+   eine weiße Seite - ein Blitz, den man im Auge behält.
+   ========================================================================== */
+@keyframes marke-zeichnen {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes marke-fuellen {
+  to {
+    fill-opacity: 1;
+  }
+}
+
+@keyframes ladeschirm-weg {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+.ladeschirm {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  background-color: var(--background);
+
+  /* Hält niemanden auf: Wer schneller ist als die Animation, tippt einfach
+     durch den Schirm hindurch auf die Seite darunter. */
+  pointer-events: none;
+
+  animation: ladeschirm-weg 400ms var(--ease-weich) 1000ms both;
+}
+
+/* Zweiter Besuch in derselben Sitzung: gar nicht erst zeigen. Einmal ist
+   ein Auftritt, bei jedem Seitenwechsel wäre es eine Bremse. Gesetzt wird
+   die Klasse vom kleinen Skript in app/layout.tsx. */
+.ohne-ladeschirm .ladeschirm {
+  display: none;
+}
+
+.ladeschirm-marke {
+  width: min(34vw, 8rem);
+  height: auto;
+}
+
+.ladeschirm-marke path {
+  fill: var(--color-marke, #ed570d);
+  fill-opacity: 0;
+  stroke: var(--color-marke, #ed570d);
+  stroke-width: 0.7;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  animation:
+    marke-zeichnen 800ms var(--ease-weich) both,
+    marke-fuellen 350ms var(--ease-weich) 600ms both;
+}
+
 /* Wer im Betriebssystem "Bewegung reduzieren" eingeschaltet hat, bekommt
    keine Animationen. Das ist keine Kür: Bewegung kann bei manchen Menschen
    Übelkeit oder Schwindel auslösen. */
@@ -429,6 +505,9 @@ details[open]::details-content {
   *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+    /* Ohne das bliebe der Ladeschirm eine Sekunde stehen und verschwände
+       dann schlagartig - das Warten ist die Bewegung, die hier stört. */
+    animation-delay: 0.01ms !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }

@@ -61,6 +61,21 @@ const themeSkript = `
 
   document.documentElement.classList.toggle("dark", dunkel);
 
+  // Der Ladeschirm soll einmal je Sitzung laufen, nicht bei jedem
+  // Seitenwechsel. Geprueft wird das hier und nicht spaeter in React:
+  // Zu dem Zeitpunkt waere der Schirm laengst zu sehen und wuerde beim
+  // Ausblenden flackern.
+  try {
+    if (sessionStorage.getItem("webfaktur-ladeschirm")) {
+      document.documentElement.classList.add("ohne-ladeschirm");
+    } else {
+      sessionStorage.setItem("webfaktur-ladeschirm", "1");
+    }
+  } catch (e) {
+    // Gesperrter Speicher: Dann laeuft er eben jedes Mal. Kein Grund
+    // abzubrechen.
+  }
+
   var angabe = document.querySelector('meta[name="theme-color"]');
   if (!angabe) {
     angabe = document.createElement("meta");

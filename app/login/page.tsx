@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 
+import { Ladeschirm } from "@/components/ladeschirm";
 import { Wortmarke } from "@/components/marke/wortmarke";
 import { ThemeUmschalter } from "@/components/theme-umschalter";
 import { Button } from "@/components/ui/button";
@@ -22,6 +23,7 @@ export default function Anmeldeseite() {
 
   return (
     <div className="flex flex-1 flex-col">
+      <Ladeschirm />
       <div className="flex justify-end p-4 sm:p-6">
         <ThemeUmschalter />
       </div>

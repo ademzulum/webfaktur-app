@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 
 import { abmelden } from "@/app/login/actions";
 import { Kopfleiste, type Menuepunkt } from "@/components/kopfleiste";
+import { Ladeschirm } from "@/components/ladeschirm";
 import { holeAngemeldetenNutzer } from "@/lib/nutzer";
 
 /**
@@ -40,6 +41,7 @@ export default async function DashboardLayout({
 
   return (
     <>
+      <Ladeschirm />
       <Kopfleiste punkte={punkte} abmelden={abmelden} />
       <div className="flex flex-1 flex-col">{children}</div>
     </>

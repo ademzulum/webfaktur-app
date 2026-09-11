@@ -26,6 +26,16 @@ function umwandeln(quelle, { name, brandKlasse, textKlasse, beschreibung }) {
   if (textKlasse) pfade = pfade.replaceAll(`class="${textKlasse}"`, 'fill="currentColor"');
   if (brandKlasse) pfade = pfade.replaceAll(`class="${brandKlasse}"`, 'fill="var(--color-marke, #ed570d)"');
 
+  // "pathLength={1}" rechnet die Länge jedes Pfades auf 1 um.
+  //
+  // Gebraucht wird das für den Ladeschirm: Dort wird das Logo gezeichnet,
+  // indem eine Strichlinie über den Pfad geschoben wird. Wie lang der Pfad
+  // wirklich ist, kann CSS nicht ermitteln - mit dieser Angabe ist die Länge
+  // immer 1, und die Animation läuft schlicht von 1 auf 0.
+  //
+  // Auf die gefüllte Darstellung hat es keine Wirkung.
+  pfade = pfade.replaceAll("<path ", "<path pathLength={1} ");
+
   const uebrig = /class="cls-\d"/.exec(pfade);
   if (uebrig) throw new Error(`Nicht ersetzte Klasse in ${quelle}: ${uebrig[0]}`);
 
