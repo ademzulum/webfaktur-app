@@ -45,9 +45,21 @@ const FLUEGEL_RECHTS =
  * der Kontur - nachgemessen erreicht sie damit alle 56.610 Bildpunkte des
  * Logos, bei 14 bleiben sieben Stellen offen.
  *
- * Dass sich das Logo dort, wo die Schlaufe sich selbst kreuzt, schon beim
- * ERSTEN Durchgang färbt, ist kein Fehler: An einer Kreuzung liegt dieselbe
- * Tinte auf beiden Zügen. Ein Stift kann sie nicht zweimal auftragen.
+ * ZUR KREUZUNG DER SCHLAUFE:
+ * Der Stift kommt bei 12 Prozent des Zuges das erste Mal an die Stelle
+ * (14.8, 42.1) und bei 31 Prozent das zweite Mal. Beim ersten Mal färbt sich
+ * dort schon ein Stück des zweiten Zuges mit - für rund 210 Millisekunden
+ * steht ein Stummel im Bild.
+ *
+ * Das ist zum größten Teil nicht zu vermeiden: An einer Kreuzung liegt
+ * dieselbe Tinte auf beiden Zügen, ein Stift kann sie nicht zweimal
+ * auftragen. Selbst mit einer Maske in exakter Stiftbreite blieben rund
+ * zehn Einheiten übrig.
+ *
+ * Ganz wegzubekommen wäre es nur, wenn das Logo als ZWEI getrennte Flächen
+ * vorläge - vor und nach der Kreuzung. Dann könnte jeder Durchgang seine
+ * eigene Fläche aufdecken und käme der anderen gar nicht nahe. Dafür müsste
+ * die Illustrator-Datei an der Kreuzung geteilt werden.
  *
  * Reihenfolge: erst der lange Zug vom linken Strich durch die Schlaufe und
  * beide Täler bis zum Pfeilschaft, dann beide Flügel gleichzeitig aus der
@@ -69,7 +81,17 @@ export function Ladeschirm() {
   const strich = {
     fill: "none",
     stroke: "#fff",
-    strokeWidth: 15,
+    // 14 und keinen Punkt breiter.
+    //
+    // Dort, wo die Schlaufe sich selbst kreuzt, deckt der Strich unweigerlich
+    // ein Stück des noch nicht gezeichneten Zuges mit auf - er kommt ihm ja
+    // zu nahe. Wie lang dieser Stummel ist, hängt an der Breite:
+    //   Breite 15: 13,8 Einheiten
+    //   Breite 14: 12,5 Einheiten, Logo noch vollständig erreicht
+    //   Breite 13: 11,3 Einheiten, aber 446 Stellen bleiben offen
+    // Bei der echten Stiftbreite 12 wären es rund 10. Der Löwenanteil ist
+    // also nicht zu vermeiden - siehe die Erklärung weiter unten.
+    strokeWidth: 14,
     strokeLinecap: "round" as const,
     strokeLinejoin: "round" as const,
   };
