@@ -171,27 +171,32 @@ function umdrehen(d) {
 }
 
 const marke = nurPfade("images/logomark.svg");
-const zug = nurPfade("images/logomark-path.svg");
 
-// Die beiden Dateien zeigen dasselbe Logo, aber unterschiedlich:
-//   logomark.svg       die FLAECHE - der Umriss der fertigen Marke
-//   logomark-path.svg  die LINIE   - der Weg, den der Stift genommen hat,
-//                                    mit 12 Einheiten Konturstaerke
+// images/logo-cut.svg ist dasselbe Logo als LINIE, aber in vier benannte
+// Teile zerschnitten - so, wie der Stift sie nacheinander zieht. Die Namen
+// stehen als "id" in der Datei.
 //
-// Die Linie ist genau die Mittellinie der Flaeche. Nachgemessen: 229 von 230
-// Abtastpunkten liegen innerhalb der Flaeche, mit im Mittel 5,6 Einheiten
-// Abstand zum Rand - also der halben Konturstaerke, wie es sein muss.
-//
-// Illustrator hat die Linienfassung mit etwas mehr Rand exportiert. Der
-// Unterschied der beiden Zeichenflaechen, halbiert, ergibt den Versatz, der
-// die Linie ueber die Flaeche legt.
+// Drei davon laufen in der Datei rueckwaerts (vom Pfeil zum linken Strich).
+// Sie werden hier umgedreht, damit beim Zeichnen nichts zu verdrehen bleibt.
+const geschnitten = readFileSync("images/logo-cut.svg", "utf8");
+const stuecke = Object.fromEntries(
+  [...geschnitten.matchAll(/<path id="([^"]+)"[^>]*\sd="([^"]+)"/g)].map(
+    (t) => [t[1], t[2]],
+  ),
+);
+
+for (const noetig of ["AnfangSchlaufe", "Schlaufe", "W", "Pfeilkopf"]) {
+  if (!stuecke[noetig]) throw new Error(`Teil "${noetig}" fehlt in logo-cut.svg`);
+}
+
+const zugViewBox = /viewBox="([^"]+)"/.exec(geschnitten)[1];
 const [, , fb, fh] = marke.viewBox.split(/\s+/).map(Number);
-const [, , zb, zh] = zug.viewBox.split(/\s+/).map(Number);
+const [, , zb, zh] = zugViewBox.split(/\s+/).map(Number);
 const versatz = `translate(${((fb - zb) / 2).toFixed(3)} ${((fh - zh) / 2).toFixed(3)})`;
 
 writeFileSync(
   "components/marke/pfade.ts",
-  `// Erzeugt aus images/logomark.svg und images/logomark-path.svg -
+  `// Erzeugt aus images/logomark.svg und images/logo-cut.svg -
 // nicht von Hand bearbeiten.
 //
 // Gebraucht vom Ladeschirm, der ein eigenes SVG mit einer Maske darüber
@@ -204,21 +209,24 @@ export const LOGOMARK_PFAD =
   "${marke.d.join(" ")}";
 
 /**
- * Die Linie, die der Stift genommen hat - die Mittellinie der Fläche.
+ * Die vier Teile des Zuges, in der Reihenfolge, in der der Stift sie zieht.
  * Aus Illustrator, nicht zurückgerechnet.
  *
- * ZUG ist gegenüber der Illustrator-Datei UMGEDREHT: Dort verläuft die Linie
- * vom Pfeil nach links, gezeichnet werden soll aber von links. Das Umdrehen
- * passiert beim Erzeugen, damit beim Zeichnen selbst nichts zu verdrehen
- * bleibt.
- *
- * PFEIL ist der Pfeilkopf: ein V mit abgerundeter Spitze in der Mitte.
+ * Die ersten drei sind gegenüber der Datei umgedreht: Dort laufen sie vom
+ * Pfeil nach links, gezeichnet werden soll aber von links.
  */
-export const LOGOMARK_ZUG =
-  "${umdrehen(zug.d[0])}";
+export const ZUG_ANFANG =
+  "${umdrehen(stuecke.AnfangSchlaufe)}";
 
-export const LOGOMARK_PFEIL =
-  "${zug.d[1]}";
+export const ZUG_SCHLAUFE =
+  "${umdrehen(stuecke.Schlaufe)}";
+
+export const ZUG_W =
+  "${umdrehen(stuecke.W)}";
+
+/** Der Pfeilkopf: ein V mit abgerundeter Spitze in der Mitte. */
+export const ZUG_PFEIL =
+  "${stuecke.Pfeilkopf}";
 
 /** Legt die Linie deckungsgleich über die Fläche. */
 export const LOGOMARK_ZUG_VERSATZ = "${versatz}";

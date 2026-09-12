@@ -481,22 +481,37 @@ details[open]::details-content {
   height: auto;
 }
 
-/* Der wandernde Strich. Bewusst fast gleichmäßig statt stark abbremsend:
-   Ein Stift wird beim Schreiben nicht langsamer, je weiter er kommt. */
-.ladeschirm-zug {
+/* Die vier Teile des Zuges, nacheinander.
+   Die Dauern folgen NICHT genau der Länge: Der kurze Anstrich und die
+   Schlaufe laufen zügiger, als es ihre Länge hergäbe. Eine Hand macht das
+   genauso - sie zieht den kleinen Haken und die Runde flott und nimmt sich
+   für die langen Abstriche Zeit.
+
+   Nebeneffekt, der hier den Ausschlag gab: Der Stummel an der Kreuzung
+   steht dadurch rund 215 statt 265 Millisekunden im Bild. */
+.zug-anfang {
   stroke-dasharray: 1;
-  animation: zug-zeichnen 1300ms cubic-bezier(0.4, 0.1, 0.3, 1) both;
+  animation: zug-zeichnen 80ms linear both;
 }
 
-/* Die beiden Flügel des Pfeilkopfs.
+.zug-schlaufe {
+  stroke-dasharray: 1;
+  animation: zug-zeichnen 140ms linear 80ms both;
+}
 
-   Gleiche Verzögerung für beide - dadurch öffnen sie sich gleichzeitig nach
-   außen, statt dass einer nachgereicht wird.
+.zug-w {
+  stroke-dasharray: 1;
+  animation: zug-zeichnen 1080ms cubic-bezier(0.25, 0.1, 0.3, 1) 220ms both;
+}
 
-   Sie beginnen BEWUSST, bevor der Zug fertig ist. Der Zug bremst zum Schluss
+/* Die beiden Flügel des Pfeilkopfs. Gleiche Verzögerung für beide - dadurch
+   öffnen sie sich gleichzeitig nach außen, statt dass einer nachgereicht
+   wird.
+
+   Sie beginnen BEWUSST, bevor der W-Zug fertig ist. Der bremst zum Schluss
    ab; wären die Flügel erst danach dran, stünde der Pfeil einen Moment lang
    ohne Kopf da. */
-.ladeschirm-fluegel {
+.zug-fluegel {
   stroke-dasharray: 1;
   animation: zug-zeichnen 360ms var(--ease-weich) 1180ms both;
 }
